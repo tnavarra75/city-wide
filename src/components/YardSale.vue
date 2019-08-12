@@ -5,7 +5,7 @@
       <div>
         <ul class="filter-buttons">
           <li class="filter-button" @click="filterByType(''); filterMarkers();">all</li>
-          <li class="filter-button" v-bind:class="{ filterButtonActive: categories.antiques }" @click="filterByType('antiques'); filterMarkers()" >antiques</li>
+          <li class="filter-button" v-bind:class="{ filterButtonActive: categories.antiques }" @click="filterByType('antiques'); filterMarkers()">antiques</li>
           <li class="filter-button" v-bind:class="{ filterButtonActive: categories.babyItems }" @click="filterByType('baby items'); filterMarkers()">baby items</li>
           <li class="filter-button" v-bind:class="{ filterButtonActive: categories.clothing }" @click="filterByType('clothing'); filterMarkers()">clothing</li>
           <li class="filter-button" v-bind:class="{ filterButtonActive: categories.furniture }" @click="filterByType('furniture'); filterMarkers()">furniture</li>
@@ -18,14 +18,13 @@
       </div>
       <!-- <div class="form-group">
         <input type="text" class="form-control" v-model="search" placeholder="Search" />
-      </div> -->
+      </div>-->
       <div class="table-responsive">
         <section v-if="errored">
           <p>We're sorry, we're not able to retrieve this information at the moment, please try back later</p>
         </section>
         <section v-else>
           <div v-if="loading">Loading...</div>
-
           <table class="table table-striped table-bordered" style="width:100%">
             <thead width="400px">
               <tr>
@@ -49,12 +48,8 @@
                 <th scope="col">Items for Sale</th>
               </tr>
             </thead>
-            <tbody>
-              <tr
-                v-if="sellerList"
-                v-for="(seller, index) in (sortedActivity, filteredList)"
-                :key="index"
-              >
+            <tbody v-if="sellerList">
+              <tr v-for="(seller, index) in (sortedActivity, filteredList)" :key="index">
                 <td>{{seller.address.streetNumber}} {{seller.address.streetName}}</td>
                 <td>{{seller.ward}}</td>
                 <td>{{seller.itemsList}}</td>
@@ -65,7 +60,7 @@
       </div>
       <button @click="prevPage" class="float-left btn btn-outline-info btn-sm">
         <i class="fas fa-arrow-left"></i>
-        {{ currentPage }}
+        {{ currentPage - 1}}
       </button>
       <button @click="nextPage" class="float-right btn btn-outline-info btn-sm">
         {{ currentPage + 1 }}
@@ -77,7 +72,6 @@
 
 <script>
 import axios from "axios";
-import {loadedGoogleMapsAPI} from '@/main'
 import { lookUpWard, wardListings } from "@/wardListings";
 
 export default {
@@ -90,7 +84,7 @@ export default {
       currentSortDir: "asc",
       pageSize: 10,
       currentPage: 1,
-      search: '',
+      search: [],
       categories: {
         antiques: false,
         babyItems: false,
@@ -106,12 +100,12 @@ export default {
   },
 
   mounted() {
-      this.$map = new google.maps.Map(document.getElementById('map'), {
-        center: new google.maps.LatLng(42.458427, -71.066162),
-        zoom: 15
-      });
+    this.$map = new google.maps.Map(document.getElementById("map"), {
+      center: new google.maps.LatLng(42.458427, -71.066162),
+      zoom: 15
+    });
 
-        // GET DATA FROM GOOGLE SHEET
+    // GET DATA FROM GOOGLE SHEET
     axios
       .get(
         "https://spreadsheets.google.com/feeds/list/1kwJ58AfcjcIyiyLrgS56Ar_jY7z0W_zTzIGFudkyq4E/od6/public/values?alt=json"
@@ -123,17 +117,17 @@ export default {
         console.log(error);
         this.errored = true;
       })
-      .finally(() => (this.placeMarkers()));
+      .finally(() => this.placeMarkers());
   },
 
   methods: {
     placeMarkers: function() {
       let i;
       this.$markers = [];
-      
+
       for (i = 0; i < this.sellerList.length; i++) {
-        let lat = Number(this.sellerList[i].latLng.split(',')[0]);
-        let lng = Number(this.sellerList[i].latLng.split(',')[1]);
+        let lat = Number(this.sellerList[i].latLng.split(",")[0]);
+        let lng = Number(this.sellerList[i].latLng.split(",")[1]);
         const info = `${this.sellerList[i].address.streetNumber} ${this.sellerList[i].address.streetName}</br>${this.sellerList[i].itemsList}`;
 
         let marker = new google.maps.Marker({
@@ -150,44 +144,30 @@ export default {
           maxWidth: 300
         });
 
-        marker.addListener('click', function () {
+        marker.addListener("click", function() {
           infowindow.open(map, marker);
         });
 
         this.$markers.push(marker);
       }
-      
+
       const bounds = new google.maps.LatLngBounds();
-        for (let i = 0; i < this.$markers.length; i++) {
-          bounds.extend(this.$markers[i].getPosition());
+      for (let i = 0; i < this.$markers.length; i++) {
+        bounds.extend(this.$markers[i].getPosition());
       }
-      
+
       this.$map.fitBounds(bounds);
-    },
-
-    checkCategories: function(seller) { 
-      let isFound = false;
-
-      for (let i = 0; i < this.search.length; i++) {
-        if (isFound === true) {
-          return;
-        } else if (seller.itemsList.includes(this.search[i])) {
-          isFound = true;
-        } else {
-          return false;
-        }
-      }
     },
 
     filterMarkers: function() {
       let i;
 
-      if (this.search === 'babyItems') {
-        this.search = 'baby items'
+      if (this.search === "babyItems") {
+        this.search = "baby items";
       }
-      
+
       for (i = 0; i < this.$markers.length; i++) {
-        if (this.$markers[i].itemsList.includes(this.search)) {
+        if (this.$markers[i].itemsList.includes(this.search[0])) {
           this.$markers[i].setMap(this.$map);
         } else {
           this.$markers[i].setMap(null);
@@ -203,29 +183,45 @@ export default {
     },
 
     filterByType: function(category) {
-      this.search = category;
-
-      if (category === 'baby items') {
-        category = 'babyItems'    
-      } else if (category === 'toys/games') {
-        category = 'toysGames'
-      } else if (category === 'kitchen items') {
-        category = 'kitchenItems'
-      } else if (category === 'sporting goods') {
-        category = 'sportingGoods'
-      } 
+      if (category === "baby items") {
+        category = "babyItems";
+      } else if (category === "toys/games") {
+        category = "toysGames";
+      } else if (category === "kitchen items") {
+        category = "kitchenItems";
+      } else if (category === "sporting goods") {
+        category = "sportingGoods";
+      }
 
       this.categories[category] = !this.categories[category];
 
+      //  if category is true, push to the search, otherwise remove from search
 
-      // if category is true, push to the search, otherwise remove from search
-      // if (this.categories[category]) {
-      //   this.search.push(category);
-      // } else {
-      //   let index = this.search.indexOf(category);
-      //   console.log(index);
-      //   this.search.splice(index, 1); 
-      // }
+      if (this.categories[category]) {
+        if (category === "babyItems") {
+          category = "baby items";
+        } else if (category === "toysGames") {
+          category = "toys/games";
+        } else if (category === "kitchenItems") {
+          category = "kitchen items";
+        } else if (category === "sportingGoods") {
+          category = "sporting goods";
+        }
+        this.search.push(category);
+      } else {
+        if (category === "babyItems") {
+          category = "baby items";
+        } else if (category === "toysGames") {
+          category = "toys/games";
+        } else if (category === "kitchenItems") {
+          category = "kitchen items";
+        } else if (category === "sportingGoods") {
+          category = "sporting goods";
+        }
+        let index = this.search.indexOf(category);
+        console.log(index);
+        this.search.splice(index, 1);
+      }
     },
 
     nextPage: function() {
@@ -324,28 +320,25 @@ export default {
     },
 
     sortedActivity() {
-      return this.sellerList
-        .sort((a, b) => {
-          let modifier = 1;
-          if (this.currentSortDir === "desc") modifier = -1;
+      return this.sellerList.sort((a, b) => {
+        let modifier = 1;
+        if (this.currentSortDir === "desc") modifier = -1;
 
-          if (this.currentSort === "address") {
-            if (a.address.streetName < b.address.streetName)
-              return -1 * modifier;
-            if (a.address.streetName > b.address.streetName)
-              return 1 * modifier;
-            return 0;
-          } else {
-            if (a[this.currentSort] < b[this.currentSort]) return -1 * modifier;
-            if (a[this.currentSort] > b[this.currentSort]) return 1 * modifier;
-            return 0;
-          }
-        })
-        .filter((row, index) => {
-          let start = (this.currentPage - 1) * this.pageSize;
-          let end = this.currentPage * this.pageSize;
-          if (index >= start && index < end) return true;
-        });
+        if (this.currentSort === "address") {
+          if (a.address.streetName < b.address.streetName) return -1 * modifier;
+          if (a.address.streetName > b.address.streetName) return 1 * modifier;
+          return 0;
+        } else {
+          if (a[this.currentSort] < b[this.currentSort]) return -1 * modifier;
+          if (a[this.currentSort] > b[this.currentSort]) return 1 * modifier;
+          return 0;
+        }
+      });
+      // .filter((row, index) => {
+      //   let start = (this.currentPage - 1) * this.pageSize;
+      //   let end = this.currentPage * this.pageSize;
+      //   if (index >= start && index < end) return true;
+      // });
     },
 
     filteredList() {
@@ -353,11 +346,38 @@ export default {
         this.currentSortDir === "asc";
       }
 
+      // function checkCategories(seller) {
+      //   let isFound;
+      //   // finds sellers that have ANY of the search categories
+      //   for (let i = 0; i < this.search.length; i++) {
+      //     if (isFound === false) {
+      //       return;
+      //     } else if (seller.itemsList.includes(this.search[i])) {
+      //       isFound = true;
+      //     } else {
+      //       isFound = false;
+      //     }
+      //   }
+      //   return isFound;
+      // }
+
+      // return this.sellerList.filter(seller => {
+
+      //   let itemsList = checkCategories(seller);
+      //   return itemsList;
+      // });
+      // .filter((row, index) => {
+      //   let start = (this.currentPage - 1) * this.pageSize;
+      //   let end = this.currentPage * this.pageSize;
+      //   if (index >= start && index < end) return true;
+      // });
+
+      // ORIGINAL
       return this.sellerList
         .filter(seller => {
             let itemsList = seller.itemsList
             .toLowerCase()
-            .includes(this.search.toLowerCase());
+            .includes(this.search[0].toLowerCase());
           return itemsList;
         })
         .filter((row, index) => {
@@ -368,7 +388,6 @@ export default {
     }
   }
 };
-
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
