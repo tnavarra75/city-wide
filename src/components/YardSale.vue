@@ -84,9 +84,9 @@ export default {
       currentSortDir: "asc",
       pageSize: 10,
       currentPage: 1,
-      search: [],
+      search: [''],
       categories: {
-        all: false,
+        all: true,
         antiques: false,
         babyItems: false,
         clothing: false,
@@ -122,109 +122,6 @@ export default {
   },
 
   methods: {
-    placeMarkers: function() {
-      let i;
-      this.$markers = [];
-
-      for (i = 0; i < this.sellerList.length; i++) {
-        let lat = Number(this.sellerList[i].latLng.split(",")[0]);
-        let lng = Number(this.sellerList[i].latLng.split(",")[1]);
-        const info = `${this.sellerList[i].address.streetNumber} ${this.sellerList[i].address.streetName}</br>${this.sellerList[i].itemsList}`;
-
-        let marker = new google.maps.Marker({
-          position: {
-            lat: lat,
-            lng: lng
-          },
-          map: this.$map,
-          itemsList: this.sellerList[i].itemsList
-        });
-
-        const infowindow = new google.maps.InfoWindow({
-          content: info,
-          maxWidth: 300
-        });
-
-        marker.addListener("click", function() {
-          infowindow.open(map, marker);
-        });
-
-        this.$markers.push(marker);
-      }
-
-      const bounds = new google.maps.LatLngBounds();
-      for (let i = 0; i < this.$markers.length; i++) {
-        bounds.extend(this.$markers[i].getPosition());
-      }
-
-      this.$map.fitBounds(bounds);
-    },
-
-    filterMarkers: function() {
-      for (let i = 0; i < this.$markers.length; i++) {
-        if (this.filterCategories(this.$markers[i])) {
-          this.$markers[i].setMap(this.$map);
-        } else {
-          this.$markers[i].setMap(null);
-        }
-      }
-    },
-
-    sort: function(s) {
-      if (s === this.currentSort) {
-        this.currentSortDir = this.currentSortDir === "asc" ? "desc" : "asc";
-      }
-      this.currentSort = s;
-    },
-
-    filterByType: function(category) {
-      if (category === "baby items") {
-        category = "babyItems";
-      } else if (category === "toys/games") {
-        category = "toysGames";
-      } else if (category === "kitchen items") {
-        category = "kitchenItems";
-      } else if (category === "sporting goods") {
-        category = "sportingGoods";
-      }
-
-      this.categories[category] = !this.categories[category];
-
-      if (this.categories[category]) {
-        if (category === "babyItems") {
-          category = "baby items";
-        } else if (category === "toysGames") {
-          category = "toys/games";
-        } else if (category === "kitchenItems") {
-          category = "kitchen items";
-        } else if (category === "sportingGoods") {
-          category = "sporting goods";
-        }
-        this.search.push(category);
-      } else {
-        if (category === "babyItems") {
-          category = "baby items";
-        } else if (category === "toysGames") {
-          category = "toys/games";
-        } else if (category === "kitchenItems") {
-          category = "kitchen items";
-        } else if (category === "sportingGoods") {
-          category = "sporting goods";
-        }
-        let index = this.search.indexOf(category);
-        this.search.splice(index, 1);
-      }
-    },
-
-    nextPage: function() {
-      if (this.currentPage * this.pageSize < this.sellerList.length)
-        this.currentPage++;
-    },
-
-    prevPage: function() {
-      if (this.currentPage > 1) this.currentPage--;
-    },
-
     formatData: function(response) {
       const sellerList = [];
 
@@ -305,19 +202,143 @@ export default {
       this.loading = false;
     },
 
-    filterCategories: function(seller) {
+    nextPage: function() {
+      if (this.currentPage * this.pageSize < this.sellerList.length)
+        this.currentPage++;
+    },
+
+    prevPage: function() {
+      if (this.currentPage > 1) this.currentPage--;
+    },
+
+    placeMarkers: function() {
+      let i;
+      this.$markers = [];
+
+      for (i = 0; i < this.sellerList.length; i++) {
+        let lat = Number(this.sellerList[i].latLng.split(",")[0]);
+        let lng = Number(this.sellerList[i].latLng.split(",")[1]);
+        const info = `${this.sellerList[i].address.streetNumber} ${this.sellerList[i].address.streetName}</br>${this.sellerList[i].itemsList}`;
+
+        let marker = new google.maps.Marker({
+          position: {
+            lat: lat,
+            lng: lng
+          },
+          map: this.$map,
+          itemsList: this.sellerList[i].itemsList
+        });
+
+        const infowindow = new google.maps.InfoWindow({
+          content: info,
+          maxWidth: 300
+        });
+
+        marker.addListener("click", function() {
+          infowindow.open(map, marker);
+        });
+
+        this.$markers.push(marker);
+      }
+
+      const bounds = new google.maps.LatLngBounds();
+      for (let i = 0; i < this.$markers.length; i++) {
+        bounds.extend(this.$markers[i].getPosition());
+      }
+
+      this.$map.fitBounds(bounds);
+    },
+
+    sort: function(sortBy) {
+      if (sortBy === this.currentSort) {
+        this.currentSortDir = this.currentSortDir === "asc" ? "desc" : "asc";
+      }
+      this.currentSort = sortBy;
+    },
+
+    // capture categories to filter by
+    filterByType: function(category) {
+      if (category === "baby items") {
+        category = "babyItems";
+      } else if (category === "toys/games") {
+        category = "toysGames";
+      } else if (category === "kitchen items") {
+        category = "kitchenItems";
+      } else if (category === "sporting goods") {
+        category = "sportingGoods";
+      } else if (category === '') {
+        category = 'all'
+      }
+
+      this.categories[category] = !this.categories[category];
+
+      if (this.categories[category]) {
+        if (category === "babyItems") {
+          category = "baby items";
+        } else if (category === "toysGames") {
+          category = "toys/games";
+        } else if (category === "kitchenItems") {
+          category = "kitchen items";
+        } else if (category === "sportingGoods") {
+          category = "sporting goods";
+        }
+        this.search.push(category);
+      } else {
+        if (category === "babyItems") {
+          category = "baby items";
+        } else if (category === "toysGames") {
+          category = "toys/games";
+        } else if (category === "kitchenItems") {
+          category = "kitchen items";
+        } else if (category === "sportingGoods") {
+          category = "sporting goods";
+        } else if (category === 'all') {
+          category = ''
+        }
+        let index = this.search.indexOf(category);
+        this.search.splice(index, 1);
+      }
+    },
+    // used by computed filter property 
+    filterCategoriesExclusive: function(seller) {
       let isFound;
       // finds sellers that have ALL of the search categories
-        for (let i = 0; i < this.search.length; i++) {
-          if (isFound === false) {
-            return;
-          } else if (seller.itemsList.includes(this.search[i])) {
-            isFound = true;
-          } else {
-            isFound = false;
-          }
+      for (let i = 0; i < this.search.length; i++) {
+        if (isFound === false) {
+          return;
+        } else if (seller.itemsList.includes(this.search[i])) {
+          isFound = true;
+        } else {
+          isFound = false;
         }
-        return isFound;
+      }
+      return isFound;
+    },
+    // used by computed filter property 
+    filterCategoriesInclusive: function(seller) {
+            let isFound;
+      // finds sellers that have ANY of the search categories
+      for (let i = 0; i < this.search.length; i++) {
+        if (isFound === true) {
+          isFound = true;
+        } else if (seller.itemsList.includes(this.search[i])) {
+          isFound = true;
+        } else {
+          isFound = false;
+        }
+      }
+      return isFound;
+    },
+
+    // filter markers
+    filterMarkers: function() {
+      for (let i = 0; i < this.$markers.length; i++) {
+        if (this.filterCategoriesExclusive(this.$markers[i])) {
+          this.$markers[i].setMap(this.$map);
+        } else {
+          this.$markers[i].setMap(null);
+        }
+      }
     }
   },
 
@@ -327,12 +348,11 @@ export default {
     },
 
     sortedActivity() {
-
+      let modifier = 1;
+      if (this.currentSortDir === "desc") modifier = -1;
 
       if (this.currentSort === 'address') {
         return this.sellerList.sort((a, b) => {
-                let modifier = 1;
-      if (this.currentSortDir === "desc") modifier = -1;
         // streetNames in alphabetical order
         if (a.address.streetName > b.address.streetName) return 1 * modifier;
         if (a.address.streetName < b.address.streetName) return -1 * modifier;
@@ -347,10 +367,8 @@ export default {
         // });
       } else if (this.currentSort === 'ward') {
         return this.sellerList.sort((a, b) => {
-             let modifier = 1;
-      if (this.currentSortDir === "desc") modifier = -1;
-          if (a[this.currentSort] < b[this.currentSort]) return -1 * modifier;
-          if (a[this.currentSort] > b[this.currentSort]) return 1 * modifier;
+          if (a.ward < b.ward) return -1 * modifier;
+          if (a.ward > b.ward) return 1 * modifier;
           return 0;
         })
         // .filter((row, index) => {
@@ -360,18 +378,6 @@ export default {
         // });
           
       }
-
-      //   if (this.currentSort === "address") {
-      //     if (a.address.streetName < b.address.streetName) return -1 * modifier;
-      //     if (a.address.streetName > b.address.streetName) return 1 * modifier;
-      //     return 0;
-      //   } else {
-      //     if (a[this.currentSort] < b[this.currentSort]) return -1 * modifier;
-      //     if (a[this.currentSort] > b[this.currentSort]) return 1 * modifier;
-      //     return 0;
-      //   }
-      // });
- 
     },
 
     filteredList() {
@@ -381,14 +387,14 @@ export default {
 
       return this.sellerList
         .filter(seller => {
-        let itemsList = this.filterCategories(seller);
-        return itemsList;
-      })
-  // .filter((row, index) => {
-  //   let start = (this.currentPage - 1) * this.pageSize;
-  //   let end = this.currentPage * this.pageSize;
-  //   if (index >= start && index < end) return true;
-  // });
+          let itemsList = this.filterCategoriesInclusive(seller);
+          return itemsList;
+        })
+    // .filter((row, index) => {
+    //   let start = (this.currentPage - 1) * this.pageSize;
+    //   let end = this.currentPage * this.pageSize;
+    //   if (index >= start && index < end) return true;
+    // });
     }
   }
 };
