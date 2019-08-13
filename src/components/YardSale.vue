@@ -4,15 +4,15 @@
     <div class="container">
       <div>
         <ul class="filter-buttons">
-          <li class="filter-button" v-bind:class="{ filterButtonActive: categories.all }" @click="filterByType(''); filterMarkers();">all</li>
+          <li class="filter-button" v-bind:class="{ filterButtonActive: categories.all }" @click="filterByType('all'); filterMarkers();">all</li>
           <li class="filter-button" v-bind:class="{ filterButtonActive: categories.antiques }" @click="filterByType('antiques'); filterMarkers()">antiques</li>
-          <li class="filter-button" v-bind:class="{ filterButtonActive: categories.babyItems }" @click="filterByType('baby items'); filterMarkers()">baby items</li>
+          <li class="filter-button" v-bind:class="{ filterButtonActive: categories.babyItems }" @click="filterByType('babyItems'); filterMarkers()">baby items</li>
           <li class="filter-button" v-bind:class="{ filterButtonActive: categories.clothing }" @click="filterByType('clothing'); filterMarkers()">clothing</li>
           <li class="filter-button" v-bind:class="{ filterButtonActive: categories.furniture }" @click="filterByType('furniture'); filterMarkers()">furniture</li>
-          <li class="filter-button" v-bind:class="{ filterButtonActive: categories.toysGames }" @click="filterByType('toys/games'); filterMarkers()">toys/games</li>
+          <li class="filter-button" v-bind:class="{ filterButtonActive: categories.toysGames }" @click="filterByType('toysGames'); filterMarkers()">toys/games</li>
           <li class="filter-button" v-bind:class="{ filterButtonActive: categories.jewelry }" @click="filterByType('jewelry'); filterMarkers()">jewelry</li>
-          <li class="filter-button" v-bind:class="{ filterButtonActive: categories.kitchenItems }" @click="filterByType('kitchen items'); filterMarkers()">kitchen items</li>
-          <li class="filter-button" v-bind:class="{ filterButtonActive: categories.sportingGoods }" @click="filterByType('sporting goods'); filterMarkers()">sporting goods</li>
+          <li class="filter-button" v-bind:class="{ filterButtonActive: categories.kitchenItems }" @click="filterByType('kitchenItems'); filterMarkers()">kitchen items</li>
+          <li class="filter-button" v-bind:class="{ filterButtonActive: categories.sportingGoods }" @click="filterByType('sportingGoods'); filterMarkers()">sporting goods</li>
           <li class="filter-button" v-bind:class="{ filterButtonActive: categories.tools }" @click="filterByType('tools'); filterMarkers()">tools</li>
         </ul>
       </div>
@@ -73,6 +73,7 @@
 <script>
 import axios from "axios";
 import { lookUpWard, wardListings } from "@/wardListings";
+import { fips } from 'crypto';
 
 export default {
   data() {
@@ -84,7 +85,7 @@ export default {
       currentSortDir: "asc",
       pageSize: 10,
       currentPage: 1,
-      search: [''],
+      search: ['antiques', 'baby items', 'clothing', 'furniture', 'toys/games', 'jewelry', 'kitchen items', 'sporting goods', 'tools'],
       categories: {
         all: true,
         antiques: false,
@@ -258,45 +259,51 @@ export default {
 
     // capture categories to filter by
     filterByType: function(category) {
-      if (category === "baby items") {
-        category = "babyItems";
-      } else if (category === "toys/games") {
-        category = "toysGames";
-      } else if (category === "kitchen items") {
-        category = "kitchenItems";
-      } else if (category === "sporting goods") {
-        category = "sportingGoods";
-      } else if (category === '') {
-        category = 'all'
-      }
-
+      // flip boolean to true on clicked item
       this.categories[category] = !this.categories[category];
-
-      if (this.categories[category]) {
-        if (category === "babyItems") {
-          category = "baby items";
-        } else if (category === "toysGames") {
-          category = "toys/games";
-        } else if (category === "kitchenItems") {
-          category = "kitchen items";
-        } else if (category === "sportingGoods") {
-          category = "sporting goods";
-        }
-        this.search.push(category);
+      
+      // search array is all categories by default, remove all but the category clicked on, flip boolean on 'all' to false
+      if (this.categories.all && category !== 'all') {
+        this.search = [];
+        this.categories.all = false;
+      }
+      // push if set to true, remove if set to false
+      if (this.categories[category] && category !== 'all') {
+          if (category === "babyItems") {
+            category = "baby items";
+          } else if (category === "toysGames") {
+            category = "toys/games";
+          } else if (category === "kitchenItems") {
+            category = "kitchen items";
+          } else if (category === "sportingGoods") {
+            category = "sporting goods";
+          }
+          this.search.push(category);
       } else {
-        if (category === "babyItems") {
-          category = "baby items";
-        } else if (category === "toysGames") {
-          category = "toys/games";
-        } else if (category === "kitchenItems") {
-          category = "kitchen items";
-        } else if (category === "sportingGoods") {
-          category = "sporting goods";
-        } else if (category === 'all') {
-          category = ''
-        }
-        let index = this.search.indexOf(category);
-        this.search.splice(index, 1);
+          if (category === "babyItems") {
+            category = "baby items";
+          } else if (category === "toysGames") {
+            category = "toys/games";
+          } else if (category === "kitchenItems") {
+            category = "kitchen items";
+          } else if (category === "sportingGoods") {
+            category = "sporting goods";
+          }
+          let index = this.search.indexOf(category);
+          this.search.splice(index, 1);
+      }
+      // if click on all button after filtering - reset
+      if (category === 'all' && this.categories.all) {
+        this.search = ['antiques', 'baby items', 'clothing', 'furniture', 'toys/games', 'jewelry', 'kitchen items', 'sporting goods', 'tools'];
+        this.categories.antiques = false;
+        this.categories.babyItems = false;
+        this.categories.clothing = false;
+        this.categories.furniture = false;
+        this.categories.toysGames = false;
+        this.categories.jewelry = false;
+        this.categories.tools = false;
+        this.categories.sportingGoods = false;
+        this.categories.kitchenItems = false;
       }
     },
     // used by computed filter property 
@@ -316,7 +323,7 @@ export default {
     },
     // used by computed filter property 
     filterCategoriesInclusive: function(seller) {
-            let isFound;
+      let isFound;
       // finds sellers that have ANY of the search categories
       for (let i = 0; i < this.search.length; i++) {
         if (isFound === true) {
@@ -329,11 +336,10 @@ export default {
       }
       return isFound;
     },
-
     // filter markers
     filterMarkers: function() {
       for (let i = 0; i < this.$markers.length; i++) {
-        if (this.filterCategoriesExclusive(this.$markers[i])) {
+        if (this.filterCategoriesInclusive(this.$markers[i])) {
           this.$markers[i].setMap(this.$map);
         } else {
           this.$markers[i].setMap(null);
