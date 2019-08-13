@@ -4,7 +4,7 @@
     <div class="container">
       <div>
         <ul class="filter-buttons">
-          <li class="filter-button" @click="filterByType(''); filterMarkers();">all</li>
+          <li class="filter-button" v-bind:class="{ filterButtonActive: categories.all }" @click="filterByType(''); filterMarkers();">all</li>
           <li class="filter-button" v-bind:class="{ filterButtonActive: categories.antiques }" @click="filterByType('antiques'); filterMarkers()">antiques</li>
           <li class="filter-button" v-bind:class="{ filterButtonActive: categories.babyItems }" @click="filterByType('baby items'); filterMarkers()">baby items</li>
           <li class="filter-button" v-bind:class="{ filterButtonActive: categories.clothing }" @click="filterByType('clothing'); filterMarkers()">clothing</li>
@@ -86,6 +86,7 @@ export default {
       currentPage: 1,
       search: [],
       categories: {
+        all: false,
         antiques: false,
         babyItems: false,
         clothing: false,
@@ -160,14 +161,8 @@ export default {
     },
 
     filterMarkers: function() {
-      let i;
-
-      if (this.search === "babyItems") {
-        this.search = "baby items";
-      }
-
-      for (i = 0; i < this.$markers.length; i++) {
-        if (this.$markers[i].itemsList.includes(this.search[0])) {
+      for (let i = 0; i < this.$markers.length; i++) {
+        if (this.filterCategories(this.$markers[i])) {
           this.$markers[i].setMap(this.$map);
         } else {
           this.$markers[i].setMap(null);
@@ -195,8 +190,6 @@ export default {
 
       this.categories[category] = !this.categories[category];
 
-      //  if category is true, push to the search, otherwise remove from search
-
       if (this.categories[category]) {
         if (category === "babyItems") {
           category = "baby items";
@@ -219,7 +212,6 @@ export default {
           category = "sporting goods";
         }
         let index = this.search.indexOf(category);
-        console.log(index);
         this.search.splice(index, 1);
       }
     },
@@ -311,6 +303,21 @@ export default {
       }
       this.sellerList = sellerList;
       this.loading = false;
+    },
+
+    filterCategories: function(seller) {
+      let isFound;
+      // finds sellers that have ALL of the search categories
+        for (let i = 0; i < this.search.length; i++) {
+          if (isFound === false) {
+            return;
+          } else if (seller.itemsList.includes(this.search[i])) {
+            isFound = true;
+          } else {
+            isFound = false;
+          }
+        }
+        return isFound;
     }
   },
 
@@ -320,25 +327,51 @@ export default {
     },
 
     sortedActivity() {
-      return this.sellerList.sort((a, b) => {
-        let modifier = 1;
-        if (this.currentSortDir === "desc") modifier = -1;
 
-        if (this.currentSort === "address") {
-          if (a.address.streetName < b.address.streetName) return -1 * modifier;
-          if (a.address.streetName > b.address.streetName) return 1 * modifier;
-          return 0;
-        } else {
+
+      if (this.currentSort === 'address') {
+        return this.sellerList.sort((a, b) => {
+                let modifier = 1;
+      if (this.currentSortDir === "desc") modifier = -1;
+        // streetNames in alphabetical order
+        if (a.address.streetName > b.address.streetName) return 1 * modifier;
+        if (a.address.streetName < b.address.streetName) return -1 * modifier;
+        // then streetNumbers in order
+        if (parseInt(a.address.streetNumber) > parseInt(b.address.streetNumber)) return 1 * modifier;
+        if (parseInt(a.address.streetNumber) < parseInt(b.address.streetNumber)) return -1 * modifier;
+        })
+        // .filter((row, index) => {
+        //   let start = (this.currentPage - 1) * this.pageSize;
+        //   let end = this.currentPage * this.pageSize;
+        //   if (index >= start && index < end) return true;
+        // });
+      } else if (this.currentSort === 'ward') {
+        return this.sellerList.sort((a, b) => {
+             let modifier = 1;
+      if (this.currentSortDir === "desc") modifier = -1;
           if (a[this.currentSort] < b[this.currentSort]) return -1 * modifier;
           if (a[this.currentSort] > b[this.currentSort]) return 1 * modifier;
           return 0;
-        }
-      });
-      // .filter((row, index) => {
-      //   let start = (this.currentPage - 1) * this.pageSize;
-      //   let end = this.currentPage * this.pageSize;
-      //   if (index >= start && index < end) return true;
+        })
+        // .filter((row, index) => {
+        //   let start = (this.currentPage - 1) * this.pageSize;
+        //   let end = this.currentPage * this.pageSize;
+        //   if (index >= start && index < end) return true;
+        // });
+          
+      }
+
+      //   if (this.currentSort === "address") {
+      //     if (a.address.streetName < b.address.streetName) return -1 * modifier;
+      //     if (a.address.streetName > b.address.streetName) return 1 * modifier;
+      //     return 0;
+      //   } else {
+      //     if (a[this.currentSort] < b[this.currentSort]) return -1 * modifier;
+      //     if (a[this.currentSort] > b[this.currentSort]) return 1 * modifier;
+      //     return 0;
+      //   }
       // });
+ 
     },
 
     filteredList() {
@@ -346,45 +379,16 @@ export default {
         this.currentSortDir === "asc";
       }
 
-      // function checkCategories(seller) {
-      //   let isFound;
-      //   // finds sellers that have ANY of the search categories
-      //   for (let i = 0; i < this.search.length; i++) {
-      //     if (isFound === false) {
-      //       return;
-      //     } else if (seller.itemsList.includes(this.search[i])) {
-      //       isFound = true;
-      //     } else {
-      //       isFound = false;
-      //     }
-      //   }
-      //   return isFound;
-      // }
-
-      // return this.sellerList.filter(seller => {
-
-      //   let itemsList = checkCategories(seller);
-      //   return itemsList;
-      // });
-      // .filter((row, index) => {
-      //   let start = (this.currentPage - 1) * this.pageSize;
-      //   let end = this.currentPage * this.pageSize;
-      //   if (index >= start && index < end) return true;
-      // });
-
-      // ORIGINAL
       return this.sellerList
         .filter(seller => {
-            let itemsList = seller.itemsList
-            .toLowerCase()
-            .includes(this.search[0].toLowerCase());
-          return itemsList;
-        })
-        .filter((row, index) => {
-          let start = (this.currentPage - 1) * this.pageSize;
-          let end = this.currentPage * this.pageSize;
-          if (index >= start && index < end) return true;
-        });
+        let itemsList = this.filterCategories(seller);
+        return itemsList;
+      })
+  // .filter((row, index) => {
+  //   let start = (this.currentPage - 1) * this.pageSize;
+  //   let end = this.currentPage * this.pageSize;
+  //   if (index >= start && index < end) return true;
+  // });
     }
   }
 };
