@@ -19,20 +19,19 @@
       <!-- <div class="form-group">
         <input type="text" class="form-control" v-model="search" placeholder="Search" />
       </div>-->
-      <div class="table-responsive">
         <section v-if="errored">
           <p>We're sorry, we're not able to retrieve this information at the moment, please try back later</p>
         </section>
         <section v-else>
           <div v-if="loading">Loading...</div>
-          <table class="table table-striped table-bordered" style="width:100%">
+          <table class="sellers-table">
             <thead width="400px">
               <tr>
                 <th scope="col" @click="sort('address')">
                   Street Name
                   <i
                     v-if="currentSort === 'address'"
-                    v-bind:class="[currentSortDir === 'asc' ? 'fas fa-caret-down': 'fas fa-caret-up']"
+                    v-bind:class="[currentSortDir === 'asc' ? 'fas fa-chevron-down': 'fas fa-chevron-up']"
                     class="float-right"
                   ></i>
                 </th>
@@ -41,7 +40,7 @@
                   <i
                     v-if="currentSort === 'ward'"
                     i
-                    v-bind:class="[currentSortDir === 'asc' ? 'fas fa-caret-down': 'fas fa-caret-up']"
+                    v-bind:class="[currentSortDir === 'asc' ? 'fas fa-chevron-down': 'fas fa-chevron-up']"
                     class="float-right"
                   ></i>
                 </th>
@@ -50,24 +49,23 @@
             </thead>
             <tbody v-if="sellerList">
               <tr v-for="(seller, index) in (sortedActivity, filteredList)" :key="index">
-                <td>{{seller.address.streetNumber}} {{seller.address.streetName}}</td>
-                <td>{{seller.ward}}</td>
-                <td>{{seller.itemsList}}</td>
+                <td class="address">{{seller.address.streetNumber}} {{seller.address.streetName}}</td>
+                <td class="ward">{{seller.ward}}</td>
+                <td class="itemsList">{{seller.itemsList}}</td>
               </tr>
             </tbody>
           </table>
         </section>
       </div>
-      <button @click="prevPage" class="float-left btn btn-outline-info btn-sm">
+      <!-- <button @click="prevPage" class="float-left btn btn-outline-info btn-sm">
         <i class="fas fa-arrow-left"></i>
         {{ currentPage - 1}}
       </button>
       <button @click="nextPage" class="float-right btn btn-outline-info btn-sm">
         {{ currentPage + 1 }}
         <i class="fas fa-arrow-right"></i>
-      </button>
+      </button> -->
     </div>
-  </div>
 </template>
 
 <script>
@@ -104,7 +102,8 @@ export default {
   mounted() {
     this.$map = new google.maps.Map(document.getElementById("map"), {
       center: new google.maps.LatLng(42.458427, -71.066162),
-      zoom: 15
+      zoom: 15,
+      // styles: [{"stylers": [{ "saturation": -100 }]}]
     });
 
     // GET DATA FROM GOOGLE SHEET
@@ -219,7 +218,8 @@ export default {
       for (i = 0; i < this.sellerList.length; i++) {
         let lat = Number(this.sellerList[i].latLng.split(",")[0]);
         let lng = Number(this.sellerList[i].latLng.split(",")[1]);
-        const info = `${this.sellerList[i].address.streetNumber} ${this.sellerList[i].address.streetName}</br>${this.sellerList[i].itemsList}`;
+        const info = `<div class="info-address">${this.sellerList[i].address.streetNumber} ${this.sellerList[i].address.streetName}</div>
+                      <div class="info-items-list"></br>${this.sellerList[i].itemsList}</div>`;
 
         let marker = new google.maps.Marker({
           position: {
@@ -227,6 +227,7 @@ export default {
             lng: lng
           },
           map: this.$map,
+          // icon: 'http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|A00105',
           itemsList: this.sellerList[i].itemsList
         });
 
@@ -269,25 +270,25 @@ export default {
       }
       // push if set to true, remove if set to false
       if (this.categories[category] && category !== 'all') {
-          if (category === "babyItems") {
-            category = "baby items";
-          } else if (category === "toysGames") {
-            category = "toys/games";
-          } else if (category === "kitchenItems") {
-            category = "kitchen items";
-          } else if (category === "sportingGoods") {
-            category = "sporting goods";
-          }
+        switch (category) {
+          case 'babyItems': category = 'baby items'
+          break;
+          case 'toysGames': category = 'toys/games'
+          break;
+          case 'kitchenItems': category = 'kitchen items'
+          break;
+          case 'sportingGoods': category = 'sporting goods'
+        }
           this.search.push(category);
       } else {
-          if (category === "babyItems") {
-            category = "baby items";
-          } else if (category === "toysGames") {
-            category = "toys/games";
-          } else if (category === "kitchenItems") {
-            category = "kitchen items";
-          } else if (category === "sportingGoods") {
-            category = "sporting goods";
+          switch (category) {
+            case 'babyItems': category = 'baby items'
+            break;
+            case 'toysGames': category = 'toys/games'
+            break;
+            case 'kitchenItems': category = 'kitchen items'
+            break;
+            case 'sportingGoods': category = 'sporting goods'
           }
           let index = this.search.indexOf(category);
           this.search.splice(index, 1);
@@ -407,11 +408,20 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
+<style scoped lang="scss">
+.container {
+  width: 90%;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+
 #map {
   width: 100%;
   height: 60vh;
   background-color: #cccccc;
+  border-top: 2px solid #cccccc;
+  border-bottom: 2px solid #cccccc;
 }
 
 .filter-buttons {
@@ -432,18 +442,41 @@ export default {
   background-color: #ccc;
 }
 
-h3 {
-  margin: 40px 0 0;
+.sellers-table {
+  color: #545454;
+  border-spacing: 10px;
+  font-family: avenir;
+  font-size: 16px;
+  margin: 0 auto 100px;
+  width: 80%;
+  float: right;
+
+  th {
+    padding: 12px 10px;
+    background-color: #f3f3f3;
+  }
+
+  td {
+    padding: 12px 10px;
+    border-bottom: 1px solid #cccccc;
+
+    &.address {
+      width: 200px;
+    }
+    &.ward {
+      width: 100px;
+    }
+  }
 }
-ul {
-  list-style-type: none;
-  padding: 0;
+
+.info-address {
+  font-size: 20px;
 }
-li {
-  display: inline-block;
-  margin: 0 10px;
+
+.fa-chevron-down, .fa-chevron-up {
+  float: right;
+  color: #A00105;
+  font-size: 18px;
 }
-a {
-  color: #42b983;
-}
+
 </style>
