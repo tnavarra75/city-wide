@@ -16,14 +16,23 @@
           <li class="filter-button" v-bind:class="{ filterButtonActive: categories.tools }" @click="filterByType('tools'); filterMarkers()">tools</li>
         </ul>
       </div>
-      <!-- <div class="form-group">
-        <input type="text" class="form-control" v-model="search" placeholder="Search" />
-      </div>-->
         <section v-if="errored">
           <p>We're sorry, we're not able to retrieve this information at the moment, please try back later</p>
         </section>
         <section v-else>
           <div v-if="loading">Loading...</div>
+          <div class="filter-checkboxes">
+            <label class="filter-checkbox">all<input type="checkbox" v-model="categories.all" @change="filterByType('all'); filterMarkers();"><span class="checkmark"></span></label>
+            <label class="filter-checkbox">antiques<input type="checkbox" v-model="categories.antiques" @change="filterByType('antiques'); filterMarkers();"><span class="checkmark"></span></label>
+            <label class="filter-checkbox">baby items<input type="checkbox" v-model="categories.babyItems" @change="filterByType('baby items'); filterMarkers();"><span class="checkmark"></span></label>
+            <label class="filter-checkbox">clothing<input type="checkbox" v-model="categories.clothing"><span class="checkmark"></span></label>
+            <label class="filter-checkbox">furniture<input type="checkbox" v-model="categories.furniture"><span class="checkmark"></span></label>
+            <label class="filter-checkbox">toys/games<input type="checkbox" v-model="categories.toysGames"><span class="checkmark"></span></label>
+            <label class="filter-checkbox">jewelry<input type="checkbox" v-model="categories.jewelry"><span class="checkmark"></span></label>
+            <label class="filter-checkbox">kitchen items<input type="checkbox" v-model="categories.kitchenItems"><span class="checkmark"></span></label>
+            <label class="filter-checkbox">sporting goods<input type="checkbox" v-model="categories.sportingGoods"><span class="checkmark"></span></label>
+            <label class="filter-checkbox">tools<input type="checkbox" v-model="categories.tools"><span class="checkmark"></span></label>
+          </div>
           <table class="sellers-table">
             <thead width="400px">
               <tr>
@@ -31,7 +40,7 @@
                   Street Name
                   <i
                     v-if="currentSort === 'address'"
-                    v-bind:class="[currentSortDir === 'asc' ? 'fas fa-chevron-down': 'fas fa-chevron-up']"
+                    v-bind:class="[currentSortDir === 'asc' ? 'fas fa-chevron-down': 'fas fa-chevron-down active']"
                     class="float-right"
                   ></i>
                 </th>
@@ -40,7 +49,7 @@
                   <i
                     v-if="currentSort === 'ward'"
                     i
-                    v-bind:class="[currentSortDir === 'asc' ? 'fas fa-chevron-down': 'fas fa-chevron-up']"
+                    v-bind:class="[currentSortDir === 'asc' ? 'fas fa-chevron-down': 'fas fa-chevron-down active']"
                     class="float-right"
                   ></i>
                 </th>
@@ -67,7 +76,6 @@
       </button> -->
     </div>
 </template>
-// COMMMENT
 <script>
 import axios from "axios";
 import { lookUpWard, wardListings } from "@/wardListings";
@@ -442,6 +450,81 @@ export default {
   background-color: #ccc;
 }
 
+.filter-checkboxes {
+  background-color: #f3f3f3;
+  padding: 20px;
+  display: inline-block;
+  width: auto;
+  margin-top: 10px;
+}
+  
+/* Customize the label (the container) */
+.filter-checkbox {
+  display: block;
+  position: relative;
+  padding-left: 35px;
+  margin-bottom: 20px;
+  cursor: pointer;
+  font-size: 16px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+
+  &:last-of-type {
+    margin-bottom: 0;
+  }
+
+  /* Hide the browser's default checkbox */
+  input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+  }
+  /* When the checkbox is checked, add a background */
+  input:checked ~ .checkmark {
+    background-color: #A00105;
+  }
+  /* Show the checkmark when checked */
+  input:checked ~ .checkmark:after {
+    display: block;
+  }
+  /* Create a custom checkbox */
+  .checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 25px;
+    width: 25px;
+    background-color: #ffffff;
+  }
+  /* Create the checkmark/indicator (hidden when not checked) */
+  .checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+  }
+  /* Style the checkmark/indicator */
+  .checkmark:after {
+    left: 9px;
+    top: 5px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+  }
+
+  /* On mouse-over, add a grey background color */
+  &:hover input ~ .checkmark {
+    background-color: #ccc;
+  }
+}
+
 .sellers-table {
   color: #545454;
   border-spacing: 10px;
@@ -477,6 +560,12 @@ export default {
   float: right;
   color: #A00105;
   font-size: 18px;
+  transition: .1s;
+}
+
+.fa-chevron-down.active {
+  transform: rotate(-180deg);
+  transition: .1s;
 }
 
 </style>
