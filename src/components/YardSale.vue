@@ -1,27 +1,36 @@
 <template>
   <div>
+    <div class="container">
+      <div class="main-info">
+        <h1 class="headline">2019 Melrose City Wide Yard Sale</h1>
+        <h2 class="subhead">Saturday, Sept. 21, 2019</h2>
+        <h3 class="time">9:00 am - 2:00 pm</h3>
+      </div>
+    </div>
     <div id="map"></div>
     <div class="container">
-        <section v-if="errored">
-          <p>We're sorry, we're not able to retrieve this information at the moment, please try back later</p>
-        </section>
-        <section v-else>
-          <div v-if="loading">Loading...</div>
-          <div class="filter-checkboxes">
-            <h4 class="filter-label">Filter by</h4>
-            <label class="filter-checkbox">antiques<input type="checkbox" value="antiques" v-model="checkedCategories" @change="filterByTypeCheckbox(); filterMarkers()"> <span class="checkmark"></span></label>
-            <label class="filter-checkbox">baby items<input type="checkbox" value="baby items" v-model="checkedCategories" @change="filterByTypeCheckbox(); filterMarkers()"><span class="checkmark"></span></label>
-            <label class="filter-checkbox">clothing<input type="checkbox" value="clothing" v-model="checkedCategories" @change="filterByTypeCheckbox(); filterMarkers()"><span class="checkmark"></span></label>
-            <label class="filter-checkbox">furniture<input type="checkbox" value="furniture" v-model="checkedCategories" @change="filterByTypeCheckbox(); filterMarkers()"><span class="checkmark"></span></label>
-            <label class="filter-checkbox">toys/games<input type="checkbox" value="toys/games" v-model="checkedCategories" @change="filterByTypeCheckbox(); filterMarkers()"><span class="checkmark"></span></label>
-            <label class="filter-checkbox">jewelry<input type="checkbox" value="jewelry" v-model="checkedCategories" @change="filterByTypeCheckbox(); filterMarkers()"><span class="checkmark"></span></label>
-            <label class="filter-checkbox">kitchen items<input type="checkbox" value="kitchen items" v-model="checkedCategories" @change="filterByTypeCheckbox(); filterMarkers()"><span class="checkmark"></span></label>
-            <label class="filter-checkbox">sporting goods<input type="checkbox" value="sporting goods" v-model="checkedCategories" @change="filterByTypeCheckbox(); filterMarkers()"><span class="checkmark"></span></label>
-            <label class="filter-checkbox">tools<input type="checkbox" value="tools" v-model="checkedCategories" @change="filterByTypeCheckbox(); filterMarkers()"><span class="checkmark"></span></label>
-            <p @click="clearFilters()">X clear filters</p>
-          </div>
+      <section v-if="errored">
+        <p>We're sorry, we're not able to retrieve this information at the moment, please try back later</p>
+      </section>
+      <section v-else>
+        <div v-if="loading">Loading...</div>
+        <div class="filter-checkboxes">
+          <h4 class="filter-label">Filter by</h4>
+          <label class="filter-checkbox">antiques<input type="checkbox" value="antiques" v-model="checkedCategories" @change="filterByTypeCheckbox(); filterMarkers()"> <span class="checkmark"></span></label>
+          <label class="filter-checkbox">baby items<input type="checkbox" value="baby items" v-model="checkedCategories" @change="filterByTypeCheckbox(); filterMarkers()"><span class="checkmark"></span></label>
+          <label class="filter-checkbox">clothing<input type="checkbox" value="clothing" v-model="checkedCategories" @change="filterByTypeCheckbox(); filterMarkers()"><span class="checkmark"></span></label>
+          <label class="filter-checkbox">furniture<input type="checkbox" value="furniture" v-model="checkedCategories" @change="filterByTypeCheckbox(); filterMarkers()"><span class="checkmark"></span></label>
+          <label class="filter-checkbox">toys/games<input type="checkbox" value="toys/games" v-model="checkedCategories" @change="filterByTypeCheckbox(); filterMarkers()"><span class="checkmark"></span></label>
+          <label class="filter-checkbox">jewelry<input type="checkbox" value="jewelry" v-model="checkedCategories" @change="filterByTypeCheckbox(); filterMarkers()"><span class="checkmark"></span></label>
+          <label class="filter-checkbox">kitchen items<input type="checkbox" value="kitchen items" v-model="checkedCategories" @change="filterByTypeCheckbox(); filterMarkers()"><span class="checkmark"></span></label>
+          <label class="filter-checkbox">sporting goods<input type="checkbox" value="sporting goods" v-model="checkedCategories" @change="filterByTypeCheckbox(); filterMarkers()"><span class="checkmark"></span></label>
+          <label class="filter-checkbox">tools<input type="checkbox" value="tools" v-model="checkedCategories" @change="filterByTypeCheckbox(); filterMarkers()"><span class="checkmark"></span></label>
+          <p @click="clearFilters()">X clear filters</p>
+        </div>
+        <div class="results">
+          <div class="results-tally">Showing {{ numResults }} listings in {{ filteredCategories }}</div>
           <table class="sellers-table">
-            <thead width="400px">
+            <thead>
               <tr>
                 <th scope="col" @click="sort('address')">
                   Street Name
@@ -51,9 +60,10 @@
               </tr>
             </tbody>
           </table>
-        </section>
-      </div>
+        </div>
+      </section>
     </div>
+  </div>
 </template>
 <script>
 import axios from "axios";
@@ -241,6 +251,7 @@ export default {
     clearFilters: function() {
       this.search = ['antiques', 'baby items', 'clothing', 'furniture', 'toys/games', 'jewelry', 'kitchen items', 'sporting goods', 'tools'];
       this.checkedCategories = [];
+      this.placeMarkers();
     },
     // used by computed filter property 
     filterCategoriesExclusive: function(seller) {
@@ -295,6 +306,14 @@ export default {
   },
 
   computed: {
+    numResults() {
+      return this.filteredList.length;
+    },
+
+    filteredCategories() {
+      return this.checkedCategories.length === 0 ? 'all categories' : this.checkedCategories.join(', ');
+    },
+
     totalNumPages() {
       return Math.ceil(this.sellerList.length / this.pageSize);
     },
@@ -346,12 +365,37 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
+
+h1, h2, h3, h4, h5, h6 {
+  padding: 0;
+  margin: 0;
+  font-weight: normal;
+}
+
+.main-info {
+  text-align: center;
+
+  h1 {
+    color: #A00105;
+    font-size: 30px;
+    font-weight: normal;
+    padding: 20px 0 0;
+  }
+
+  h2 {
+
+  }
+
+  h3 {
+
+  }
+
+}
 .container {
   width: 90%;
   max-width: 1100px;
   margin: 0 auto;
 }
-
 
 #map {
   width: 100%;
@@ -359,25 +403,7 @@ export default {
   background-color: #cccccc;
   border-top: 2px solid #cccccc;
   border-bottom: 2px solid #cccccc;
-  margin-bottom: 40px;
-}
-
-.filter-buttons {
-  display: flex;
-  justify-content: space-between;
-  list-style: none;
-  margin: 20px 0;
-  padding: 0;
-}
-
-.filter-button {
-  /* display: block; */
-  padding: 10px;
-  border: 1px solid #ccc;
-}
-
-.filterButtonActive {
-  background-color: #ccc;
+  margin: 20px 0 40px;
 }
 
 .filter-checkboxes {
@@ -385,7 +411,6 @@ export default {
   padding: 14px 20px;
   display: inline-block;
   width: auto;
-  margin-top: 10px;
 }
   
 /* Customize the label (the container) */
@@ -455,14 +480,25 @@ export default {
   }
 }
 
+.results {
+  width: 80%;
+  float: right;
+
+  .results-tally {
+    color: #545454;
+    font-style: italic;
+    font-size: 14px;
+    padding: 0 12px 12px 12px;
+  }
+}
+
 .sellers-table {
   color: #545454;
   border-spacing: 10px;
   font-family: avenir;
   font-size: 16px;
   margin: 0 auto 100px;
-  width: 80%;
-  float: right;
+  width: 100%;
 
   th {
     padding: 12px 10px;
