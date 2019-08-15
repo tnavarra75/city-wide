@@ -2,36 +2,23 @@
   <div>
     <div id="map"></div>
     <div class="container">
-      <div>
-        <ul class="filter-buttons">
-          <li class="filter-button" v-bind:class="{ filterButtonActive: categories.all }" @click="filterByType('all'); filterMarkers();">all</li>
-          <li class="filter-button" v-bind:class="{ filterButtonActive: categories.antiques }" @click="filterByType('antiques'); filterMarkers()">antiques</li>
-          <li class="filter-button" v-bind:class="{ filterButtonActive: categories.babyItems }" @click="filterByType('babyItems'); filterMarkers()">baby items</li>
-          <li class="filter-button" v-bind:class="{ filterButtonActive: categories.clothing }" @click="filterByType('clothing'); filterMarkers()">clothing</li>
-          <li class="filter-button" v-bind:class="{ filterButtonActive: categories.furniture }" @click="filterByType('furniture'); filterMarkers()">furniture</li>
-          <li class="filter-button" v-bind:class="{ filterButtonActive: categories.toysGames }" @click="filterByType('toysGames'); filterMarkers()">toys/games</li>
-          <li class="filter-button" v-bind:class="{ filterButtonActive: categories.jewelry }" @click="filterByType('jewelry'); filterMarkers()">jewelry</li>
-          <li class="filter-button" v-bind:class="{ filterButtonActive: categories.kitchenItems }" @click="filterByType('kitchenItems'); filterMarkers()">kitchen items</li>
-          <li class="filter-button" v-bind:class="{ filterButtonActive: categories.sportingGoods }" @click="filterByType('sportingGoods'); filterMarkers()">sporting goods</li>
-          <li class="filter-button" v-bind:class="{ filterButtonActive: categories.tools }" @click="filterByType('tools'); filterMarkers()">tools</li>
-        </ul>
-      </div>
         <section v-if="errored">
           <p>We're sorry, we're not able to retrieve this information at the moment, please try back later</p>
         </section>
         <section v-else>
           <div v-if="loading">Loading...</div>
           <div class="filter-checkboxes">
-            <label class="filter-checkbox">all<input type="checkbox" v-model="categories.all" @change="filterByType('all'); filterMarkers();"><span class="checkmark"></span></label>
-            <label class="filter-checkbox">antiques<input type="checkbox" v-model="categories.antiques" @change="filterByType('antiques'); filterMarkers();"><span class="checkmark"></span></label>
-            <label class="filter-checkbox">baby items<input type="checkbox" v-model="categories.babyItems" @change="filterByType('baby items'); filterMarkers();"><span class="checkmark"></span></label>
-            <label class="filter-checkbox">clothing<input type="checkbox" v-model="categories.clothing"><span class="checkmark"></span></label>
-            <label class="filter-checkbox">furniture<input type="checkbox" v-model="categories.furniture"><span class="checkmark"></span></label>
-            <label class="filter-checkbox">toys/games<input type="checkbox" v-model="categories.toysGames"><span class="checkmark"></span></label>
-            <label class="filter-checkbox">jewelry<input type="checkbox" v-model="categories.jewelry"><span class="checkmark"></span></label>
-            <label class="filter-checkbox">kitchen items<input type="checkbox" v-model="categories.kitchenItems"><span class="checkmark"></span></label>
-            <label class="filter-checkbox">sporting goods<input type="checkbox" v-model="categories.sportingGoods"><span class="checkmark"></span></label>
-            <label class="filter-checkbox">tools<input type="checkbox" v-model="categories.tools"><span class="checkmark"></span></label>
+            <h4 class="filter-label">Filter by</h4>
+            <label class="filter-checkbox">antiques<input type="checkbox" value="antiques" v-model="checkedCategories" @change="filterByTypeCheckbox(); filterMarkers()"> <span class="checkmark"></span></label>
+            <label class="filter-checkbox">baby items<input type="checkbox" value="baby items" v-model="checkedCategories" @change="filterByTypeCheckbox(); filterMarkers()"><span class="checkmark"></span></label>
+            <label class="filter-checkbox">clothing<input type="checkbox" value="clothing" v-model="checkedCategories" @change="filterByTypeCheckbox(); filterMarkers()"><span class="checkmark"></span></label>
+            <label class="filter-checkbox">furniture<input type="checkbox" value="furniture" v-model="checkedCategories" @change="filterByTypeCheckbox(); filterMarkers()"><span class="checkmark"></span></label>
+            <label class="filter-checkbox">toys/games<input type="checkbox" value="toys/games" v-model="checkedCategories" @change="filterByTypeCheckbox(); filterMarkers()"><span class="checkmark"></span></label>
+            <label class="filter-checkbox">jewelry<input type="checkbox" value="jewelry" v-model="checkedCategories" @change="filterByTypeCheckbox(); filterMarkers()"><span class="checkmark"></span></label>
+            <label class="filter-checkbox">kitchen items<input type="checkbox" value="kitchen items" v-model="checkedCategories" @change="filterByTypeCheckbox(); filterMarkers()"><span class="checkmark"></span></label>
+            <label class="filter-checkbox">sporting goods<input type="checkbox" value="sporting goods" v-model="checkedCategories" @change="filterByTypeCheckbox(); filterMarkers()"><span class="checkmark"></span></label>
+            <label class="filter-checkbox">tools<input type="checkbox" value="tools" v-model="checkedCategories" @change="filterByTypeCheckbox(); filterMarkers()"><span class="checkmark"></span></label>
+            <p @click="clearFilters()">X clear filters</p>
           </div>
           <table class="sellers-table">
             <thead width="400px">
@@ -57,7 +44,7 @@
               </tr>
             </thead>
             <tbody v-if="sellerList">
-              <tr v-for="(seller, index) in (sortedActivity, filteredList)" :key="index">
+              <tr class="list-complete-item" v-for="(seller, index) in (sortedActivity, filteredList)" :key="index">
                 <td class="address">{{seller.address.streetNumber}} {{seller.address.streetName}}</td>
                 <td class="ward">{{seller.ward}}</td>
                 <td class="itemsList">{{seller.itemsList}}</td>
@@ -66,20 +53,11 @@
           </table>
         </section>
       </div>
-      <!-- <button @click="prevPage" class="float-left btn btn-outline-info btn-sm">
-        <i class="fas fa-arrow-left"></i>
-        {{ currentPage - 1}}
-      </button>
-      <button @click="nextPage" class="float-right btn btn-outline-info btn-sm">
-        {{ currentPage + 1 }}
-        <i class="fas fa-arrow-right"></i>
-      </button> -->
     </div>
 </template>
 <script>
 import axios from "axios";
 import { lookUpWard, wardListings } from "@/wardListings";
-import { fips } from 'crypto';
 
 export default {
   data() {
@@ -92,18 +70,7 @@ export default {
       pageSize: 10,
       currentPage: 1,
       search: ['antiques', 'baby items', 'clothing', 'furniture', 'toys/games', 'jewelry', 'kitchen items', 'sporting goods', 'tools'],
-      categories: {
-        all: true,
-        antiques: false,
-        babyItems: false,
-        clothing: false,
-        furniture: false,
-        toysGames: false,
-        jewelry: false,
-        kitchenItems: false,
-        sportingGoods: false,
-        tools: false
-      }
+      checkedCategories: []
     };
   },
 
@@ -265,55 +232,15 @@ export default {
       }
       this.currentSort = sortBy;
     },
+    
+    filterByTypeCheckbox: function() {
+        this.search = this.checkedCategories;
+        if (this.checkedCategories.length === 0) this.clearFilters();
+    },
 
-    // capture categories to filter by
-    filterByType: function(category) {
-      // flip boolean to true on clicked item
-      this.categories[category] = !this.categories[category];
-      
-      // search array is all categories by default, remove all but the category clicked on, flip boolean on 'all' to false
-      if (this.categories.all && category !== 'all') {
-        this.search = [];
-        this.categories.all = false;
-      }
-      // push if set to true, remove if set to false
-      if (this.categories[category] && category !== 'all') {
-        switch (category) {
-          case 'babyItems': category = 'baby items'
-          break;
-          case 'toysGames': category = 'toys/games'
-          break;
-          case 'kitchenItems': category = 'kitchen items'
-          break;
-          case 'sportingGoods': category = 'sporting goods'
-        }
-          this.search.push(category);
-      } else {
-          switch (category) {
-            case 'babyItems': category = 'baby items'
-            break;
-            case 'toysGames': category = 'toys/games'
-            break;
-            case 'kitchenItems': category = 'kitchen items'
-            break;
-            case 'sportingGoods': category = 'sporting goods'
-          }
-          let index = this.search.indexOf(category);
-          this.search.splice(index, 1);
-      }
-      // if click on all button after filtering - reset
-      if (category === 'all' && this.categories.all) {
-        this.search = ['antiques', 'baby items', 'clothing', 'furniture', 'toys/games', 'jewelry', 'kitchen items', 'sporting goods', 'tools'];
-        this.categories.antiques = false;
-        this.categories.babyItems = false;
-        this.categories.clothing = false;
-        this.categories.furniture = false;
-        this.categories.toysGames = false;
-        this.categories.jewelry = false;
-        this.categories.tools = false;
-        this.categories.sportingGoods = false;
-        this.categories.kitchenItems = false;
-      }
+    clearFilters: function() {
+      this.search = ['antiques', 'baby items', 'clothing', 'furniture', 'toys/games', 'jewelry', 'kitchen items', 'sporting goods', 'tools'];
+      this.checkedCategories = [];
     },
     // used by computed filter property 
     filterCategoriesExclusive: function(seller) {
@@ -347,11 +274,21 @@ export default {
     },
     // filter markers
     filterMarkers: function() {
-      for (let i = 0; i < this.$markers.length; i++) {
-        if (this.filterCategoriesInclusive(this.$markers[i])) {
-          this.$markers[i].setMap(this.$map);
-        } else {
-          this.$markers[i].setMap(null);
+      if (this.checkedCategories.length === 0) {
+        for (let i = 0; i < this.$markers.length; i++) {        
+          if (this.filterCategoriesInclusive(this.$markers[i])) {
+            this.$markers[i].setMap(this.$map);
+          } else {
+            this.$markers[i].setMap(null);
+          }
+        }
+      } else {
+        for (let i = 0; i < this.$markers.length; i++) {        
+          if (this.filterCategoriesExclusive(this.$markers[i])) {
+            this.$markers[i].setMap(this.$map);
+          } else {
+            this.$markers[i].setMap(null);
+          }
         }
       }
     }
@@ -374,24 +311,13 @@ export default {
         // then streetNumbers in order
         if (parseInt(a.address.streetNumber) > parseInt(b.address.streetNumber)) return 1 * modifier;
         if (parseInt(a.address.streetNumber) < parseInt(b.address.streetNumber)) return -1 * modifier;
-        })
-        // .filter((row, index) => {
-        //   let start = (this.currentPage - 1) * this.pageSize;
-        //   let end = this.currentPage * this.pageSize;
-        //   if (index >= start && index < end) return true;
-        // });
+        });
       } else if (this.currentSort === 'ward') {
         return this.sellerList.sort((a, b) => {
           if (a.ward < b.ward) return -1 * modifier;
           if (a.ward > b.ward) return 1 * modifier;
           return 0;
-        })
-        // .filter((row, index) => {
-        //   let start = (this.currentPage - 1) * this.pageSize;
-        //   let end = this.currentPage * this.pageSize;
-        //   if (index >= start && index < end) return true;
-        // });
-          
+        });
       }
     },
 
@@ -400,16 +326,19 @@ export default {
         this.currentSortDir === "asc";
       }
 
-      return this.sellerList
-        .filter(seller => {
+
+      if (this.checkedCategories.length === 0) {
+        return this.sellerList.filter(seller => {
           let itemsList = this.filterCategoriesInclusive(seller);
           return itemsList;
-        })
-    // .filter((row, index) => {
-    //   let start = (this.currentPage - 1) * this.pageSize;
-    //   let end = this.currentPage * this.pageSize;
-    //   if (index >= start && index < end) return true;
-    // });
+        });
+      } else {
+          return this.sellerList.filter(seller => {
+            let itemsList = this.filterCategoriesExclusive(seller);
+            return itemsList;
+        });
+      }
+
     }
   }
 };
@@ -430,6 +359,7 @@ export default {
   background-color: #cccccc;
   border-top: 2px solid #cccccc;
   border-bottom: 2px solid #cccccc;
+  margin-bottom: 40px;
 }
 
 .filter-buttons {
@@ -452,7 +382,7 @@ export default {
 
 .filter-checkboxes {
   background-color: #f3f3f3;
-  padding: 20px;
+  padding: 14px 20px;
   display: inline-block;
   width: auto;
   margin-top: 10px;
@@ -566,6 +496,10 @@ export default {
 .fa-chevron-down.active {
   transform: rotate(-180deg);
   transition: .1s;
+}
+
+.filter-label {
+  padding-bottom: 15px;
 }
 
 </style>
