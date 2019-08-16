@@ -2,19 +2,18 @@
   <div>
     <div class="container">
       <div class="main-info">
-        <h1 class="headline">2019 Melrose City Wide Yard Sale to benefit Friends of the Milano Center</h1>
+        <h1 class="headline">2019 Melrose City Wide Yard Sale to Benefit Friends of the Milano Center</h1>
         <h2 class="subhead">Saturday, Sept. 21, 2019</h2>
         <h3 class="time">9:00 am &ndash; 2:00 pm</h3>
       </div>
     </div>
     <div id="map"></div>
-    <div class="container">
-      <section v-if="errored">
+    <div>
+      <section class="container filters-listings-container" v-if="errored">
         <p>We're sorry, we're not able to retrieve this information at the moment, please try back later</p>
       </section>
-      <section v-else>
-        <div v-if="loading">Loading...</div>
-        <div class="filter-checkboxes">
+      <section class="container filters-listings-container" v-else>
+        <div class="filters-container">
           <h4 class="filter-label">Filter by</h4>
           <label class="filter-checkbox">antiques<input type="checkbox" value="antiques" v-model="checkedCategories" @change="filterByTypeCheckbox(); filterMarkers()"> <span class="checkmark"></span></label>
           <label class="filter-checkbox">baby items<input type="checkbox" value="baby items" v-model="checkedCategories" @change="filterByTypeCheckbox(); filterMarkers()"><span class="checkmark"></span></label>
@@ -25,41 +24,33 @@
           <label class="filter-checkbox">kitchen items<input type="checkbox" value="kitchen items" v-model="checkedCategories" @change="filterByTypeCheckbox(); filterMarkers()"><span class="checkmark"></span></label>
           <label class="filter-checkbox">sporting goods<input type="checkbox" value="sporting goods" v-model="checkedCategories" @change="filterByTypeCheckbox(); filterMarkers()"><span class="checkmark"></span></label>
           <label class="filter-checkbox">tools<input type="checkbox" value="tools" v-model="checkedCategories" @change="filterByTypeCheckbox(); filterMarkers()"><span class="checkmark"></span></label>
-          <p class="clear-filters" @click="clearFilters()">clear filters</p>
+          <p class="filter-checkbox clear-filters" @click="clearFilters()">clear filters</p>
         </div>
-        <div class="results">
-          <div class="results-tally">Showing {{ numResults }} listings with {{ filteredCategories }}</div>
-          <table class="sellers-table">
-            <thead>
-              <tr>
-                <th scope="col" @click="sort('address')">
-                  Street Name
-                  <i
-                    v-if="currentSort === 'address'"
-                    v-bind:class="[currentSortDir === 'asc' ? 'fas fa-chevron-down': 'fas fa-chevron-down active']"
-                    class="float-right"
-                  ></i>
-                </th>
-                <th scope="col" @click="sort('ward')">
-                  Ward
-                  <i
-                    v-if="currentSort === 'ward'"
-                    i
-                    v-bind:class="[currentSortDir === 'asc' ? 'fas fa-chevron-down': 'fas fa-chevron-down active']"
-                    class="float-right"
-                  ></i>
-                </th>
-                <th scope="col">Items for Sale</th>
-              </tr>
-            </thead>
-            <tbody v-if="sellerList">
-              <tr class="list-complete-item" v-for="(seller, index) in (sortedActivity, filteredList)" :key="index">
-                <td class="address">{{seller.address.streetNumber}} {{seller.address.streetName}}</td>
-                <td class="ward">{{seller.ward}}</td>
-                <td class="itemsList">{{seller.itemsList}}</td>
-              </tr>
-            </tbody>
-          </table>
+        <div class="listings-container">
+          <div v-if="loading">Loading...</div>
+          <div class="listings-tally">
+            Showing {{ numResults }} listings in {{ filteredCategories }}
+          </div>
+          <div class="listing listing-heading">
+            <div class="street-name" @click="sort('address')">
+              Street Name
+              <i v-if="currentSort === 'address'" v-bind:class="[currentSortDir === 'asc' ? 'fas fa-chevron-down': 'fas fa-chevron-down active']"></i>
+            </div>
+            <div class="ward" @click="sort('ward')">
+              Ward
+              <i v-if="currentSort === 'ward'" v-bind:class="[currentSortDir === 'asc' ? 'fas fa-chevron-down': 'fas fa-chevron-down active']"></i>
+              </div>
+            <div class="items-list">
+              Items for sale
+            </div>
+          </div>
+          <transition-group name="list" tag="div">
+            <div class="listing" v-for="(seller, index) in (sortedActivity, filteredList)" :key="index">
+              <div class="street-name" v-if="sellerList">{{seller.address.streetNumber}} {{seller.address.streetName}}</div>
+              <div class="ward">{{seller.ward}}</div>
+              <div class="items-list">{{seller.itemsList}}</div>
+            </div>
+          </transition-group>
         </div>
       </section>
     </div>

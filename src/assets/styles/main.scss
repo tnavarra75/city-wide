@@ -3,7 +3,9 @@ h2,
 h3,
 h4,
 h5,
-h6 {
+h6,
+p,
+a {
     padding: 0;
     margin: 0;
     font-weight: normal;
@@ -44,33 +46,97 @@ h6 {
     margin: 20px 0 40px;
 }
 
-#info-address {
-    font-size: 16px;
+.filters-listings-container {
+    display: flex;
+    flex-flow: column wrap;
+    margin-bottom: 200px;
+    font-size: 15px;
+    @media screen and (min-width: 1100px) {
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: flex-start;
+    }
 }
 
-.filter-checkboxes {
+.filters-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
     background-color: #f3f3f3;
     padding: 14px 20px;
-    display: inline-block;
-    width: auto;
+    margin-bottom: 20px;
+    @media screen and (min-width: 1100px) {
+        flex-direction: column;
+        margin-right: 5%;
+    }
+}
+
+.listings-container {
+    @media screen and (min-width: 1100px) {
+        flex: 2 0 0;
+    }
+}
+
+.listing {
+    display: flex;
+    flex-wrap: wrap;
+    .street-name {
+        width: 180px;
+        padding: 15px;
+        margin-right: 10px;
+        border-bottom: 1px solid #ccc;
+    }
+    .ward {
+        width: 90px;
+        padding: 10px;
+        margin-right: 10px;
+        border-bottom: 1px solid #ccc;
+    }
+    .items-list {
+        flex: 2 0 0;
+        padding: 10px;
+        border-bottom: 1px solid #ccc;
+    }
+    &.listing-heading {
+        margin-bottom: 10px;
+    }
+    &.listing-heading .street-name,
+    &.listing-heading .ward,
+    &.listing-heading .items-list {
+        font-weight: 600;
+        background-color: #f3f3f3;
+        border-bottom: none;
+    }
+}
+
+.listings-tally {
+    color: #545454;
+    font-style: italic;
+    font-size: 14px;
+    padding: 0 12px 12px 0;
 }
 
 
 /* Customize the label (the container) */
 
 .filter-checkbox {
-    display: block;
+    display: inline-block;
     position: relative;
     padding-left: 35px;
-    margin-bottom: 20px;
-    cursor: pointer;
+    margin-right: 20px;
     font-size: 16px;
+    cursor: pointer;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
     &:last-of-type {
         margin-bottom: 0;
+    }
+    @media screen and (min-width: 1100px) {
+        display: block;
+        margin-bottom: 20px;
+        margin-right: 0;
     }
     /* Hide the browser's default checkbox */
     input {
@@ -121,44 +187,6 @@ h6 {
     }
 }
 
-.results {
-    width: 80%;
-    float: right;
-    .results-tally {
-        color: #545454;
-        font-style: italic;
-        font-size: 14px;
-        padding: 0 12px 12px 12px;
-    }
-}
-
-.sellers-table {
-    color: #545454;
-    border-spacing: 10px;
-    font-family: 'Open Sans', sans-serif;
-    font-size: 16px;
-    margin: 0 auto 100px;
-    width: 100%;
-    th {
-        padding: 12px 10px;
-        background-color: #f3f3f3;
-    }
-    td {
-        padding: 12px 10px;
-        border-bottom: 1px solid #cccccc;
-        &.address {
-            width: 200px;
-        }
-        &.ward {
-            width: 100px;
-        }
-    }
-}
-
-.info-address {
-    font-size: 20px;
-}
-
 .fa-chevron-down,
 .fa-chevron-up {
     float: right;
@@ -173,10 +201,31 @@ h6 {
 }
 
 .filter-label {
+    font-weight: 600;
     padding-bottom: 15px;
+    margin-right: 20px;
+    @media screen and (min-width: 1100px) {
+        margin-right: 0;
+    }
 }
 
 .clear-filters {
-    padding-top: 10px;
     text-decoration: underline;
+    @media screen and (min-width: 1100px) {
+        padding-top: 20px;
+    }
+}
+
+.list-enter-active,
+.list-leave-active {
+    transition: all .2s;
+}
+
+.list-enter,
+.list-leave-to {
+    opacity: 0;
+}
+
+.list-move {
+    transition: transform .2s;
 }
