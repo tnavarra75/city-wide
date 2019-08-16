@@ -2,9 +2,9 @@
   <div>
     <div class="container">
       <div class="main-info">
-        <h1 class="headline">2019 Melrose City Wide Yard Sale</h1>
+        <h1 class="headline">2019 Melrose City Wide Yard Sale to benefit Friends of the Milano Center</h1>
         <h2 class="subhead">Saturday, Sept. 21, 2019</h2>
-        <h3 class="time">9:00 am - 2:00 pm</h3>
+        <h3 class="time">9:00 am &ndash; 2:00 pm</h3>
       </div>
     </div>
     <div id="map"></div>
@@ -25,10 +25,10 @@
           <label class="filter-checkbox">kitchen items<input type="checkbox" value="kitchen items" v-model="checkedCategories" @change="filterByTypeCheckbox(); filterMarkers()"><span class="checkmark"></span></label>
           <label class="filter-checkbox">sporting goods<input type="checkbox" value="sporting goods" v-model="checkedCategories" @change="filterByTypeCheckbox(); filterMarkers()"><span class="checkmark"></span></label>
           <label class="filter-checkbox">tools<input type="checkbox" value="tools" v-model="checkedCategories" @change="filterByTypeCheckbox(); filterMarkers()"><span class="checkmark"></span></label>
-          <p @click="clearFilters()">X clear filters</p>
+          <p class="clear-filters" @click="clearFilters()">clear filters</p>
         </div>
         <div class="results">
-          <div class="results-tally">Showing {{ numResults }} listings in {{ filteredCategories }}</div>
+          <div class="results-tally">Showing {{ numResults }} listings with {{ filteredCategories }}</div>
           <table class="sellers-table">
             <thead>
               <tr>
@@ -203,13 +203,17 @@ export default {
       for (i = 0; i < this.sellerList.length; i++) {
         let lat = Number(this.sellerList[i].latLng.split(",")[0]);
         let lng = Number(this.sellerList[i].latLng.split(",")[1]);
-        const info = `<div class="info-address">${this.sellerList[i].address.streetNumber} ${this.sellerList[i].address.streetName}</div>
-                      <div class="info-items-list"></br>${this.sellerList[i].itemsList}</div>`;
+        const info = `<div style="font-family: 'Open Sans', sans-serif; font-size: 15px;"><strong>${this.sellerList[i].address.streetNumber} ${this.sellerList[i].address.streetName}</strong><br>
+                      ${this.sellerList[i].itemsList}<div>`;
 
         let marker = new google.maps.Marker({
           position: {
             lat: lat,
             lng: lng
+          },
+          icon: {
+            url: 'http://s3.amazonaws.com/mullen-misc-assets/tn-test/round-place.png', 
+            scaledSize: new google.maps.Size(26, 36), // scaled size
           },
           map: this.$map,
           // icon: 'http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|A00105',
@@ -365,177 +369,5 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-
-h1, h2, h3, h4, h5, h6 {
-  padding: 0;
-  margin: 0;
-  font-weight: normal;
-}
-
-.main-info {
-  text-align: center;
-
-  h1 {
-    color: #A00105;
-    font-size: 30px;
-    font-weight: normal;
-    padding: 20px 0 0;
-  }
-
-  h2 {
-
-  }
-
-  h3 {
-
-  }
-
-}
-.container {
-  width: 90%;
-  max-width: 1100px;
-  margin: 0 auto;
-}
-
-#map {
-  width: 100%;
-  height: 60vh;
-  background-color: #cccccc;
-  border-top: 2px solid #cccccc;
-  border-bottom: 2px solid #cccccc;
-  margin: 20px 0 40px;
-}
-
-.filter-checkboxes {
-  background-color: #f3f3f3;
-  padding: 14px 20px;
-  display: inline-block;
-  width: auto;
-}
-  
-/* Customize the label (the container) */
-.filter-checkbox {
-  display: block;
-  position: relative;
-  padding-left: 35px;
-  margin-bottom: 20px;
-  cursor: pointer;
-  font-size: 16px;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-
-  &:last-of-type {
-    margin-bottom: 0;
-  }
-
-  /* Hide the browser's default checkbox */
-  input {
-    position: absolute;
-    opacity: 0;
-    cursor: pointer;
-    height: 0;
-    width: 0;
-  }
-  /* When the checkbox is checked, add a background */
-  input:checked ~ .checkmark {
-    background-color: #A00105;
-  }
-  /* Show the checkmark when checked */
-  input:checked ~ .checkmark:after {
-    display: block;
-  }
-  /* Create a custom checkbox */
-  .checkmark {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 25px;
-    width: 25px;
-    background-color: #ffffff;
-  }
-  /* Create the checkmark/indicator (hidden when not checked) */
-  .checkmark:after {
-    content: "";
-    position: absolute;
-    display: none;
-  }
-  /* Style the checkmark/indicator */
-  .checkmark:after {
-    left: 9px;
-    top: 5px;
-    width: 5px;
-    height: 10px;
-    border: solid white;
-    border-width: 0 3px 3px 0;
-    -webkit-transform: rotate(45deg);
-    -ms-transform: rotate(45deg);
-    transform: rotate(45deg);
-  }
-
-  /* On mouse-over, add a grey background color */
-  &:hover input ~ .checkmark {
-    background-color: #ccc;
-  }
-}
-
-.results {
-  width: 80%;
-  float: right;
-
-  .results-tally {
-    color: #545454;
-    font-style: italic;
-    font-size: 14px;
-    padding: 0 12px 12px 12px;
-  }
-}
-
-.sellers-table {
-  color: #545454;
-  border-spacing: 10px;
-  font-family: avenir;
-  font-size: 16px;
-  margin: 0 auto 100px;
-  width: 100%;
-
-  th {
-    padding: 12px 10px;
-    background-color: #f3f3f3;
-  }
-
-  td {
-    padding: 12px 10px;
-    border-bottom: 1px solid #cccccc;
-
-    &.address {
-      width: 200px;
-    }
-    &.ward {
-      width: 100px;
-    }
-  }
-}
-
-.info-address {
-  font-size: 20px;
-}
-
-.fa-chevron-down, .fa-chevron-up {
-  float: right;
-  color: #A00105;
-  font-size: 18px;
-  transition: .1s;
-}
-
-.fa-chevron-down.active {
-  transform: rotate(-180deg);
-  transition: .1s;
-}
-
-.filter-label {
-  padding-bottom: 15px;
-}
-
+ @import '@/assets/styles/main.scss';
 </style>
