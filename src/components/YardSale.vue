@@ -46,10 +46,9 @@
           </div>
           <transition-group name="list" tag="div">
             <div class="listing" v-for="(seller, index) in (sortedActivity, filteredList)" :key="index">
-              <div class="street-name" v-if="sellerList">{{seller.address.streetNumber}} {{seller.address.streetName}}</div>
+              <div class="street-name" v-if="sellerList">{{seller.address.streetNumber}} {{seller.address.streetName}} <a class="directions" target="blank" :href="`https://google.com/maps?saddr=My+Location&daddr=${seller.address.streetNumber}+${seller.address.streetName}+Melrose+MA+02176`"><i class="fas fa-location-arrow"></i></a></div>
               <div class="ward">{{seller.ward}}</div>
               <div class="items-list">{{seller.itemsList}}</div>
-              <div class="directions"><a class="directions" target="blank" :href="`https://google.com/maps?saddr=My+Location&daddr=${seller.address.streetNumber}+${seller.address.streetName}+Melrose+MA+02176`"><i class="fas fa-location-arrow"></i></a></div>
             </div>
           </transition-group>
         </div>
@@ -196,10 +195,10 @@ export default {
       for (i = 0; i < this.sellerList.length; i++) {
         let lat = Number(this.sellerList[i].latLng.split(",")[0]);
         let lng = Number(this.sellerList[i].latLng.split(",")[1]);
-        const info = `<div style="font-family: 'Open Sans', sans-serif; font-size: 15px; padding-bottom: 5px;">
-                      <strong>${this.sellerList[i].address.streetNumber} ${this.sellerList[i].address.streetName}</strong><br>
-                      ${this.sellerList[i].itemsList}<br>
-                      <a style="color: #A00105" target="_blank" href="https://www.google.com/maps?saddr=My+Location&daddr=${this.sellerList[i].address.streetNumber}+${this.sellerList[i].address.streetName}+Melrose+MA+02176">get directions</a>
+        const info = `<div style="font-family: 'Open Sans', sans-serif; font-size: 15px;">
+                      <div style="color: #A00105; font-weight: 600; padding-bottom: 3px;">${this.sellerList[i].address.streetNumber} ${this.sellerList[i].address.streetName}</div>
+                      <div style="padding-bottom: 10px;">${this.sellerList[i].itemsList}</div>
+                      <a style="color: #545454;" target="_blank" href="https://www.google.com/maps?saddr=My+Location&daddr=${this.sellerList[i].address.streetNumber}+${this.sellerList[i].address.streetName}+Melrose+MA+02176">get directions <i style="color: #A00105; font-size: 13px; padding-left: 5px;" class="fas fa-location-arrow"></i></a>
                       <div>`;
 
         let marker = new google.maps.Marker({
