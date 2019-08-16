@@ -88,13 +88,13 @@ a {
     }
     .ward {
         width: 90px;
-        padding: 10px;
+        padding: 15px;
         margin-right: 10px;
         border-bottom: 1px solid #ccc;
     }
     .items-list {
         flex: 2 0 0;
-        padding: 10px;
+        padding: 15px;
         border-bottom: 1px solid #ccc;
     }
     &.listing-heading {
@@ -124,7 +124,6 @@ a {
     position: relative;
     padding-left: 35px;
     margin-right: 20px;
-    font-size: 16px;
     cursor: pointer;
     -webkit-user-select: none;
     -moz-user-select: none;
@@ -228,4 +227,8 @@ a {
 
 .list-move {
     transition: transform .2s;
+}
+
+.directions {
+    color: #A00105;
 }

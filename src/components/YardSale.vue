@@ -2,7 +2,7 @@
   <div>
     <div class="container">
       <div class="main-info">
-        <h1 class="headline">2019 Melrose City Wide Yard Sale to Benefit Friends of the Milano Center</h1>
+        <h1 class="headline">2019 Melrose City Wide Yard Sale</h1>
         <h2 class="subhead">Saturday, Sept. 21, 2019</h2>
         <h3 class="time">9:00 am &ndash; 2:00 pm</h3>
       </div>
@@ -49,6 +49,7 @@
               <div class="street-name" v-if="sellerList">{{seller.address.streetNumber}} {{seller.address.streetName}}</div>
               <div class="ward">{{seller.ward}}</div>
               <div class="items-list">{{seller.itemsList}}</div>
+              <div class="directions"><a class="directions" target="blank" :href="`https://google.com/maps?saddr=My+Location&daddr=${seller.address.streetNumber}+${seller.address.streetName}+Melrose+MA+02176`"><i class="fas fa-location-arrow"></i></a></div>
             </div>
           </transition-group>
         </div>
@@ -56,6 +57,7 @@
     </div>
   </div>
 </template>
+
 <script>
 import axios from "axios";
 import { lookUpWard, wardListings } from "@/wardListings";
@@ -194,8 +196,11 @@ export default {
       for (i = 0; i < this.sellerList.length; i++) {
         let lat = Number(this.sellerList[i].latLng.split(",")[0]);
         let lng = Number(this.sellerList[i].latLng.split(",")[1]);
-        const info = `<div style="font-family: 'Open Sans', sans-serif; font-size: 15px;"><strong>${this.sellerList[i].address.streetNumber} ${this.sellerList[i].address.streetName}</strong><br>
-                      ${this.sellerList[i].itemsList}<div>`;
+        const info = `<div style="font-family: 'Open Sans', sans-serif; font-size: 15px; padding-bottom: 5px;">
+                      <strong>${this.sellerList[i].address.streetNumber} ${this.sellerList[i].address.streetName}</strong><br>
+                      ${this.sellerList[i].itemsList}<br>
+                      <a style="color: #A00105" target="_blank" href="https://www.google.com/maps?saddr=My+Location&daddr=${this.sellerList[i].address.streetNumber}+${this.sellerList[i].address.streetName}+Melrose+MA+02176">get directions</a>
+                      <div>`;
 
         let marker = new google.maps.Marker({
           position: {

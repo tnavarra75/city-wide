@@ -15,10 +15,12 @@
     <noscript>
       <strong>We're sorry but city-wide-yard-sale doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
     </noscript>
-    <div class="top-border"></div>
+    <a id="top"></a>
     <div id="app"></div>
+    <a href="#top" id="to-top" class="to-top"><i class="fas fa-arrow-circle-up"></i></a>
     <!-- built files will be auto injected -->
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAaMgfwMK9el9nUzIt9JUIKaK3hT9DcZs0"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 </body>
 
 </html>
@@ -28,8 +30,19 @@
         margin: 0;
         padding: 0;
     }
-    /* .top-border {
-        height: 8px;
-        background-color: #A00105;
-    } */
+    
+    .to-top {
+        opacity: 0;
+        color: #A00105;
+        position: fixed;
+        bottom: 20px;
+        right: 50px;
+        font-size: 30px;
+        transition: .2s;
+    }
+    
+    .to-top-active {
+        opacity: 1;
+        transition: .2s;
+    }
 </style>
