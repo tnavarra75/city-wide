@@ -1,5 +1,5 @@
 export const lookUpWard = function(address) {
-    address = address.toLowerCase().split(' ')[0];
+    address = address.toLowerCase();
     for (let i = 0; i < wardListings.length; i++) {
         if (wardListings[i].streetName.includes(address)) {
             const ward = wardListings[i].ward;
@@ -89,7 +89,7 @@ export const wardListings = [{
         ward: '1'
     },
     {
-        streetName: 'ashmont park',
+        streetName: 'ashmont pk',
         ward: '5'
     },
     {
@@ -205,7 +205,7 @@ export const wardListings = [{
         ward: '6'
     },
     {
-        streetName: 'bradford park',
+        streetName: 'bradford pk',
         ward: '4'
     },
     {
@@ -273,7 +273,7 @@ export const wardListings = [{
         ward: '3'
     },
     {
-        streetName: 'chestnut park',
+        streetName: 'chestnut pk',
         ward: '6'
     },
     {
@@ -317,11 +317,11 @@ export const wardListings = [{
         ward: '2'
     },
     {
-        streetName: 'clifton park',
+        streetName: 'clifton pk',
         ward: '1'
     },
     {
-        streetName: 'clifton park ct',
+        streetName: 'clifton pk ct',
         ward: '1'
     },
     {
@@ -361,7 +361,7 @@ export const wardListings = [{
         ward: '2'
     },
     {
-        streetName: 'cottage park',
+        streetName: 'cottage pk',
         ward: '3'
     },
     {
@@ -413,7 +413,7 @@ export const wardListings = [{
         ward: '3'
     },
     {
-        streetName: 'cypress park',
+        streetName: 'cypress pk',
         ward: '4'
     },
     {
@@ -445,15 +445,15 @@ export const wardListings = [{
         ward: '1'
     },
     {
-        streetName: 'east emerson st',
+        streetName: 'e emerson st',
         ward: '4'
     },
     {
-        streetName: 'east foster st',
+        streetName: 'e foster st',
         ward: '6'
     },
     {
-        streetName: 'east highland ave',
+        streetName: 'e highland ave',
         ward: '2'
     },
     {
@@ -461,7 +461,7 @@ export const wardListings = [{
         ward: '4'
     },
     {
-        streetName: 'east wyoming ave',
+        streetName: 'e wyoming ave',
         ward: '5, 6'
     },
     {
@@ -773,7 +773,7 @@ export const wardListings = [{
         ward: '4'
     },
     {
-        streetName: 'hillside park',
+        streetName: 'hillside pk',
         ward: '7'
     },
     {
@@ -918,7 +918,7 @@ export const wardListings = [{
     },
     {
         streetName: 'lynde st',
-        ward: '6, 7'
+        ward: '3, 6, 7'
     },
     {
         streetName: 'lynn fells pky',
@@ -1009,19 +1009,19 @@ export const wardListings = [{
         ward: '1'
     },
     {
-        streetName: 'mount hood ter',
+        streetName: 'mt hood ter',
         ward: '6'
     },
     {
-        streetName: 'mount vernon ave',
+        streetName: 'mt vernon ave',
         ward: '5'
     },
     {
-        streetName: 'mount vernon st',
+        streetName: 'mt vernon st',
         ward: '5'
     },
     {
-        streetName: 'mount zion rd',
+        streetName: 'mt zion rd',
         ward: '2'
     },
     {
@@ -1129,7 +1129,7 @@ export const wardListings = [{
         ward: '3'
     },
     {
-        streetName: 'owego park',
+        streetName: 'owego pk',
         ward: '3'
     },
     {
@@ -1365,7 +1365,7 @@ export const wardListings = [{
         ward: '1'
     },
     {
-        streetName: 'south cedar park',
+        streetName: 'south cedar pk',
         ward: '3'
     },
     {
@@ -1433,7 +1433,7 @@ export const wardListings = [{
         ward: '2'
     },
     {
-        streetName: 'swains pond ave',
+        streetName: 'swains pd ave',
         ward: '6, 7'
     },
     {
@@ -1513,7 +1513,7 @@ export const wardListings = [{
         ward: '7'
     },
     {
-        streetName: 'walton park',
+        streetName: 'walton pk',
         ward: '1'
     },
     {
@@ -1545,35 +1545,35 @@ export const wardListings = [{
         ward: '3'
     },
     {
-        streetName: 'west emerson st',
+        streetName: 'w emerson st',
         ward: '3, 4'
     },
     {
-        streetName: 'west foster st',
+        streetName: 'w foster st',
         ward: '3'
     },
     {
-        streetName: 'west foster st',
+        streetName: 'w foster st',
         ward: '6'
     },
     {
-        streetName: 'west highland ave',
+        streetName: 'w highland ave',
         ward: '1'
     },
     {
-        streetName: 'west hill ave',
+        streetName: 'w hill ave',
         ward: '1'
     },
     {
-        streetName: 'west hill ter',
+        streetName: 'w hill ter',
         ward: '1'
     },
     {
-        streetName: 'west st',
+        streetName: 'w st',
         ward: '2'
     },
     {
-        streetName: 'west wyoming ave',
+        streetName: 'w wyoming ave',
         ward: '3, 5, 6'
     },
     {

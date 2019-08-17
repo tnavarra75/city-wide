@@ -26,6 +26,10 @@
           <label class="filter-checkbox">tools<input type="checkbox" value="tools" v-model="checkedCategories" @change="filterByTypeCheckbox(); filterMarkers()"><span class="checkmark"></span></label>
           <p class="filter-checkbox clear-filters" @click="clearFilters()">clear filters</p>
         </div>
+        <select class="sort-by" @change="sortDropDown">
+          <option value="ward">Sort by: Ward</option>
+          <option value="address">Sort by: Street Name</option>
+        </select>
         <div class="listings-container">
           <div v-if="loading">Loading...</div>
           <div class="listings-tally">
@@ -46,7 +50,7 @@
           </div>
           <transition-group name="list" tag="div">
             <div class="listing" v-for="(seller, index) in (sortedActivity, filteredList)" :key="index">
-              <div class="street-name" v-if="sellerList">{{seller.address.streetNumber}} {{seller.address.streetName}} <a class="directions" target="blank" :href="`https://google.com/maps?saddr=My+Location&daddr=${seller.address.streetNumber}+${seller.address.streetName}+Melrose+MA+02176`"><i class="fas fa-location-arrow"></i></a></div>
+              <div class="street-name" v-if="sellerList">{{seller.address.streetNumber}} {{seller.address.streetName}} <a class="directions" target="blank" :href="`https://google.com/maps/dir/?api=1&destination=${seller.address.streetNumber}+${seller.address.streetName}+Melrose+MA+02176`"><i class="fas fa-location-arrow"></i></a></div>
               <div class="ward">{{seller.ward}}</div>
               <div class="items-list">{{seller.itemsList}}</div>
             </div>
@@ -67,7 +71,7 @@ export default {
       sellerList: [],
       loading: true,
       errored: false,
-      currentSort: "address",
+      currentSort: "ward",
       currentSortDir: "asc",
       pageSize: 10,
       currentPage: 1,
@@ -198,7 +202,7 @@ export default {
         const info = `<div style="font-family: 'Open Sans', sans-serif; font-size: 15px;">
                       <div style="color: #A00105; font-weight: 600; padding-bottom: 3px;">${this.sellerList[i].address.streetNumber} ${this.sellerList[i].address.streetName}</div>
                       <div style="padding-bottom: 10px;">${this.sellerList[i].itemsList}</div>
-                      <a style="color: #545454;" target="_blank" href="https://www.google.com/maps?saddr=My+Location&daddr=${this.sellerList[i].address.streetNumber}+${this.sellerList[i].address.streetName}+Melrose+MA+02176">get directions <i style="color: #A00105; font-size: 13px; padding-left: 5px;" class="fas fa-location-arrow"></i></a>
+                      <a style="color: #545454;" target="_blank" href="https://google.com/maps/dir/?api=1&destination=${this.sellerList[i].address.streetNumber}+${this.sellerList[i].address.streetName}+Melrose+MA+02176">get directions <i style="color: #A00105; font-size: 13px; padding-left: 5px;" class="fas fa-location-arrow"></i></a>
                       <div>`;
 
         let marker = new google.maps.Marker({
@@ -240,6 +244,11 @@ export default {
         this.currentSortDir = this.currentSortDir === "asc" ? "desc" : "asc";
       }
       this.currentSort = sortBy;
+    },
+
+    sortDropDown: function() {
+      let sortBy = event.target.value;
+      this.sort(sortBy);
     },
     
     filterByTypeCheckbox: function() {
