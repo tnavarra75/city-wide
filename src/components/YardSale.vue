@@ -13,23 +13,23 @@
         <p>We're sorry, we're not able to retrieve this information at the moment, please try back later</p>
       </section>
       <section class="container filters-listings-container" v-else>
-        <div class="filters-container">
-          <h4 class="filter-label">Filter by</h4>
-          <label class="filter-checkbox">antiques<input type="checkbox" value="antiques" v-model="checkedCategories" @change="filterByTypeCheckbox(); filterMarkers()"> <span class="checkmark"></span></label>
-          <label class="filter-checkbox">baby items<input type="checkbox" value="baby items" v-model="checkedCategories" @change="filterByTypeCheckbox(); filterMarkers()"><span class="checkmark"></span></label>
-          <label class="filter-checkbox">clothing<input type="checkbox" value="clothing" v-model="checkedCategories" @change="filterByTypeCheckbox(); filterMarkers()"><span class="checkmark"></span></label>
-          <label class="filter-checkbox">furniture<input type="checkbox" value="furniture" v-model="checkedCategories" @change="filterByTypeCheckbox(); filterMarkers()"><span class="checkmark"></span></label>
-          <label class="filter-checkbox">toys/games<input type="checkbox" value="toys/games" v-model="checkedCategories" @change="filterByTypeCheckbox(); filterMarkers()"><span class="checkmark"></span></label>
-          <label class="filter-checkbox">jewelry<input type="checkbox" value="jewelry" v-model="checkedCategories" @change="filterByTypeCheckbox(); filterMarkers()"><span class="checkmark"></span></label>
-          <label class="filter-checkbox">kitchen items<input type="checkbox" value="kitchen items" v-model="checkedCategories" @change="filterByTypeCheckbox(); filterMarkers()"><span class="checkmark"></span></label>
-          <label class="filter-checkbox">sporting goods<input type="checkbox" value="sporting goods" v-model="checkedCategories" @change="filterByTypeCheckbox(); filterMarkers()"><span class="checkmark"></span></label>
-          <label class="filter-checkbox">tools<input type="checkbox" value="tools" v-model="checkedCategories" @change="filterByTypeCheckbox(); filterMarkers()"><span class="checkmark"></span></label>
-          <p class="filter-checkbox clear-filters" @click="clearFilters()">clear filters</p>
+        <div class="filters-sort-container">
+          <div class="filters-sort-inner">
+            <select class="sort-dropDown" @change="sortDropDown">
+              <option value="ward">Sort by: Ward</option>
+              <option value="address">Sort by: Street Name</option>
+            </select>
+            <div class="filter-label">
+              <h4>Filters</h4>
+            </div>
+          </div>
+          <div class="filters-container">
+            <label v-for="category in categories" :key="index" class="filter-checkbox">{{category}}<input type="checkbox" :value="category" v-model="checkedCategories" @change="filterByTypeCheckbox(); filterMarkers()"> <span class="checkmark"></span></label>
+          </div>
+          <div class="clear-filters">
+            <p @click="clearFilters()">clear filters</p>
+          </div>
         </div>
-        <select class="sort-by" @change="sortDropDown">
-          <option value="ward">Sort by: Ward</option>
-          <option value="address">Sort by: Street Name</option>
-        </select>
         <div class="listings-container">
           <div v-if="loading">Loading...</div>
           <div class="listings-tally">
@@ -75,8 +75,9 @@ export default {
       currentSortDir: "asc",
       pageSize: 10,
       currentPage: 1,
-      search: ['antiques', 'baby items', 'clothing', 'furniture', 'toys/games', 'jewelry', 'kitchen items', 'sporting goods', 'tools'],
-      checkedCategories: []
+      categories: ['antiques', 'baby items', 'clothing', 'furniture', 'toys/games', 'jewelry', 'kitchen items', 'sporting goods', 'tools'],
+      checkedCategories: [],
+      search: ['antiques', 'baby items', 'clothing', 'furniture', 'toys/games', 'jewelry', 'kitchen items', 'sporting goods', 'tools']
     };
   },
 
