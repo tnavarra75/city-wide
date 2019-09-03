@@ -1,101 +1,87 @@
 <template>
   <div>
-    <div id="map"></div>
+    <div class="top-bar"></div>
     <div class="container">
-      <div>
-        <ul class="filter-buttons">
-          <li class="filter-button" v-bind:class="{ filterButtonActive: categories.all }" @click="filterByType('all'); filterMarkers();">all</li>
-          <li class="filter-button" v-bind:class="{ filterButtonActive: categories.antiques }" @click="filterByType('antiques'); filterMarkers()">antiques</li>
-          <li class="filter-button" v-bind:class="{ filterButtonActive: categories.babyItems }" @click="filterByType('babyItems'); filterMarkers()">baby items</li>
-          <li class="filter-button" v-bind:class="{ filterButtonActive: categories.clothing }" @click="filterByType('clothing'); filterMarkers()">clothing</li>
-          <li class="filter-button" v-bind:class="{ filterButtonActive: categories.furniture }" @click="filterByType('furniture'); filterMarkers()">furniture</li>
-          <li class="filter-button" v-bind:class="{ filterButtonActive: categories.toysGames }" @click="filterByType('toysGames'); filterMarkers()">toys/games</li>
-          <li class="filter-button" v-bind:class="{ filterButtonActive: categories.jewelry }" @click="filterByType('jewelry'); filterMarkers()">jewelry</li>
-          <li class="filter-button" v-bind:class="{ filterButtonActive: categories.kitchenItems }" @click="filterByType('kitchenItems'); filterMarkers()">kitchen items</li>
-          <li class="filter-button" v-bind:class="{ filterButtonActive: categories.sportingGoods }" @click="filterByType('sportingGoods'); filterMarkers()">sporting goods</li>
-          <li class="filter-button" v-bind:class="{ filterButtonActive: categories.tools }" @click="filterByType('tools'); filterMarkers()">tools</li>
-        </ul>
+      <div class="main-info">
+        <h1 class="headline">2017 Melrose City Wide Yard&nbsp;Sale</h1>
+        <h2 class="subhead"> to Benefit Friends of the Milano Center</h2>
+        <h3 class="date-time">Saturday, Sept. XX, 2017, 9:00 am &ndash; 2:00 pm</h3>
       </div>
-      <!-- <div class="form-group">
-        <input type="text" class="form-control" v-model="search" placeholder="Search" />
-      </div>-->
-        <section v-if="errored">
-          <p>We're sorry, we're not able to retrieve this information at the moment, please try back later</p>
-        </section>
-        <section v-else>
-          <div v-if="loading">Loading...</div>
-          <table class="sellers-table">
-            <thead width="400px">
-              <tr>
-                <th scope="col" @click="sort('address')">
-                  Street Name
-                  <i
-                    v-if="currentSort === 'address'"
-                    v-bind:class="[currentSortDir === 'asc' ? 'fas fa-chevron-down': 'fas fa-chevron-up']"
-                    class="float-right"
-                  ></i>
-                </th>
-                <th scope="col" @click="sort('ward')">
-                  Ward
-                  <i
-                    v-if="currentSort === 'ward'"
-                    i
-                    v-bind:class="[currentSortDir === 'asc' ? 'fas fa-chevron-down': 'fas fa-chevron-up']"
-                    class="float-right"
-                  ></i>
-                </th>
-                <th scope="col">Items for Sale</th>
-              </tr>
-            </thead>
-            <tbody v-if="sellerList">
-              <tr v-for="(seller, index) in (sortedActivity, filteredList)" :key="index">
-                <td class="address">{{seller.address.streetNumber}} {{seller.address.streetName}}</td>
-                <td class="ward">{{seller.ward}}</td>
-                <td class="itemsList">{{seller.itemsList}}</td>
-              </tr>
-            </tbody>
-          </table>
-        </section>
-      </div>
-      <!-- <button @click="prevPage" class="float-left btn btn-outline-info btn-sm">
-        <i class="fas fa-arrow-left"></i>
-        {{ currentPage - 1}}
-      </button>
-      <button @click="nextPage" class="float-right btn btn-outline-info btn-sm">
-        {{ currentPage + 1 }}
-        <i class="fas fa-arrow-right"></i>
-      </button> -->
     </div>
+    <div id="map"></div>
+    <div>
+      <section class="container filters-listings-container" v-if="errored">
+        <p>We're sorry, we're not able to retrieve this information at the moment, please try back later</p>
+      </section>
+      <section class="container filters-listings-container" v-else>
+        <div class="filters-sort-container">
+          <div class="filters-sort-inner">
+            <select class="sort-dropDown" @change="sortDropDown">
+              <option value="ward">Sort by: Ward</option>
+              <option value="address">Sort by: Street Name</option>
+            </select>
+            <div class="filter-label" @click="showFilters()">
+              <h4>Filters</h4>
+              <i v-show="mobileFilter" class="material-icons">filter_list</i>
+              <i v-show="!mobileFilter" class="material-icons">close</i>
+            </div>
+          </div>
+          <div id="filters-container" class="filters-container">
+            <label v-for="category in categories" class="filter-checkbox">{{category}}<input type="checkbox" :value="category" v-model="checkedCategories" @change="filterByTypeCheckbox(); filterMarkers()"> <span class="checkmark"></span></label>
+          </div>
+          <div id="clear-filters" class="clear-filters">
+            <p @click="clearFilters()">clear filters</p>
+          </div>
+        </div>
+        <div class="listings-container">
+          <div v-if="loading">Loading...</div>
+          <div class="listings-tally">
+            Showing {{ numResults }} listings in {{ filteredCategories }}
+          </div>
+          <div class="listing listing-heading">
+            <div class="street-name" @click="sort('address')">
+              Street Name
+              <i v-if="currentSort === 'address'" v-bind:class="[currentSortDir === 'asc' ? 'fas fa-chevron-down': 'fas fa-chevron-down active']"></i>
+            </div>
+            <div class="ward" @click="sort('ward')">
+              Ward
+              <i v-if="currentSort === 'ward'" v-bind:class="[currentSortDir === 'asc' ? 'fas fa-chevron-down': 'fas fa-chevron-down active']"></i>
+              </div>
+            <div class="items-list">
+              Items for sale
+            </div>
+          </div>
+          <transition-group name="list" tag="div">
+            <div class="listing" v-for="(seller, index) in (sortedActivity, filteredList)" :key="index">
+              <div class="street-name" v-if="sellerList">{{seller.address.streetNumber}} {{seller.address.streetName}} <a class="directions" target="blank" :href="`https://google.com/maps/dir/?api=1&destination=${seller.address.streetNumber}+${seller.address.streetName}+Melrose+MA+02176`"><i class="fas fa-location-arrow"></i></a></div>
+              <div class="ward">{{seller.ward}}</div>
+              <div class="items-list">{{seller.itemsList}}</div>
+            </div>
+          </transition-group>
+        </div>
+      </section>
+    </div>
+  </div>
 </template>
-// COMMMENT
+
 <script>
 import axios from "axios";
 import { lookUpWard, wardListings } from "@/wardListings";
-import { fips } from 'crypto';
 
 export default {
   data() {
     return {
+      mobileFilter: true,
       sellerList: [],
       loading: true,
       errored: false,
-      currentSort: "address",
+      currentSort: "ward",
       currentSortDir: "asc",
       pageSize: 10,
       currentPage: 1,
-      search: ['antiques', 'baby items', 'clothing', 'furniture', 'toys/games', 'jewelry', 'kitchen items', 'sporting goods', 'tools'],
-      categories: {
-        all: true,
-        antiques: false,
-        babyItems: false,
-        clothing: false,
-        furniture: false,
-        toysGames: false,
-        jewelry: false,
-        kitchenItems: false,
-        sportingGoods: false,
-        tools: false
-      }
+      categories: ['antiques', 'baby items', 'clothing', 'furniture', 'toys/games', 'jewelry', 'kitchen items', 'sporting goods', 'tools'],
+      checkedCategories: [],
+      search: ['antiques', 'baby items', 'clothing', 'furniture', 'toys/games', 'jewelry', 'kitchen items', 'sporting goods', 'tools']
     };
   },
 
@@ -122,6 +108,17 @@ export default {
   },
 
   methods: {
+    showFilters: function() {
+      this.mobileFilter = !this.mobileFilter;
+      if (this.mobileFilter === false) {
+        document.getElementById('filters-container').classList.add('active');
+        document.getElementById('clear-filters').classList.add('active');
+      } else {
+        document.getElementById('filters-container').classList.remove('active');
+        document.getElementById('clear-filters').classList.remove('active');
+      }
+    },
+
     formatData: function(response) {
       const sellerList = [];
 
@@ -218,13 +215,20 @@ export default {
       for (i = 0; i < this.sellerList.length; i++) {
         let lat = Number(this.sellerList[i].latLng.split(",")[0]);
         let lng = Number(this.sellerList[i].latLng.split(",")[1]);
-        const info = `<div class="info-address">${this.sellerList[i].address.streetNumber} ${this.sellerList[i].address.streetName}</div>
-                      <div class="info-items-list"></br>${this.sellerList[i].itemsList}</div>`;
+        const info = `<div style="font-family: 'Open Sans', sans-serif; font-size: 15px;">
+                      <div style="color: #A00105; font-weight: 600; padding-bottom: 3px;">${this.sellerList[i].address.streetNumber} ${this.sellerList[i].address.streetName}</div>
+                      <div style="padding-bottom: 10px;">${this.sellerList[i].itemsList}</div>
+                      <a style="color: #545454;" target="_blank" href="https://google.com/maps/dir/?api=1&destination=${this.sellerList[i].address.streetNumber}+${this.sellerList[i].address.streetName}+Melrose+MA+02176">get directions <i style="color: #A00105; font-size: 13px; padding-left: 5px;" class="fas fa-location-arrow"></i></a>
+                      <div>`;
 
         let marker = new google.maps.Marker({
           position: {
             lat: lat,
             lng: lng
+          },
+          icon: {
+            url: 'http://s3.amazonaws.com/mullen-misc-assets/tn-test/round-place.png', 
+            scaledSize: new google.maps.Size(26, 36), // scaled size
           },
           map: this.$map,
           // icon: 'http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|A00105',
@@ -258,54 +262,20 @@ export default {
       this.currentSort = sortBy;
     },
 
-    // capture categories to filter by
-    filterByType: function(category) {
-      // flip boolean to true on clicked item
-      this.categories[category] = !this.categories[category];
-      
-      // search array is all categories by default, remove all but the category clicked on, flip boolean on 'all' to false
-      if (this.categories.all && category !== 'all') {
-        this.search = [];
-        this.categories.all = false;
-      }
-      // push if set to true, remove if set to false
-      if (this.categories[category] && category !== 'all') {
-        switch (category) {
-          case 'babyItems': category = 'baby items'
-          break;
-          case 'toysGames': category = 'toys/games'
-          break;
-          case 'kitchenItems': category = 'kitchen items'
-          break;
-          case 'sportingGoods': category = 'sporting goods'
-        }
-          this.search.push(category);
-      } else {
-          switch (category) {
-            case 'babyItems': category = 'baby items'
-            break;
-            case 'toysGames': category = 'toys/games'
-            break;
-            case 'kitchenItems': category = 'kitchen items'
-            break;
-            case 'sportingGoods': category = 'sporting goods'
-          }
-          let index = this.search.indexOf(category);
-          this.search.splice(index, 1);
-      }
-      // if click on all button after filtering - reset
-      if (category === 'all' && this.categories.all) {
-        this.search = ['antiques', 'baby items', 'clothing', 'furniture', 'toys/games', 'jewelry', 'kitchen items', 'sporting goods', 'tools'];
-        this.categories.antiques = false;
-        this.categories.babyItems = false;
-        this.categories.clothing = false;
-        this.categories.furniture = false;
-        this.categories.toysGames = false;
-        this.categories.jewelry = false;
-        this.categories.tools = false;
-        this.categories.sportingGoods = false;
-        this.categories.kitchenItems = false;
-      }
+    sortDropDown: function() {
+      let sortBy = event.target.value;
+      this.sort(sortBy);
+    },
+    
+    filterByTypeCheckbox: function() {
+        this.search = this.checkedCategories;
+        if (this.checkedCategories.length === 0) this.clearFilters();
+    },
+
+    clearFilters: function() {
+      this.search = ['antiques', 'baby items', 'clothing', 'furniture', 'toys/games', 'jewelry', 'kitchen items', 'sporting goods', 'tools'];
+      this.checkedCategories = [];
+      this.placeMarkers();
     },
     // used by computed filter property 
     filterCategoriesExclusive: function(seller) {
@@ -339,17 +309,35 @@ export default {
     },
     // filter markers
     filterMarkers: function() {
-      for (let i = 0; i < this.$markers.length; i++) {
-        if (this.filterCategoriesInclusive(this.$markers[i])) {
-          this.$markers[i].setMap(this.$map);
-        } else {
-          this.$markers[i].setMap(null);
+      if (this.checkedCategories.length === 0) {
+        for (let i = 0; i < this.$markers.length; i++) {        
+          if (this.filterCategoriesInclusive(this.$markers[i])) {
+            this.$markers[i].setMap(this.$map);
+          } else {
+            this.$markers[i].setMap(null);
+          }
+        }
+      } else {
+        for (let i = 0; i < this.$markers.length; i++) {        
+          if (this.filterCategoriesExclusive(this.$markers[i])) {
+            this.$markers[i].setMap(this.$map);
+          } else {
+            this.$markers[i].setMap(null);
+          }
         }
       }
     }
   },
 
-  computed: {
+  computed: {  
+    numResults() {
+      return this.filteredList.length;
+    },
+
+    filteredCategories() {
+      return this.checkedCategories.length === 0 ? 'all categories' : this.checkedCategories.join(', ');
+    },
+
     totalNumPages() {
       return Math.ceil(this.sellerList.length / this.pageSize);
     },
@@ -366,24 +354,13 @@ export default {
         // then streetNumbers in order
         if (parseInt(a.address.streetNumber) > parseInt(b.address.streetNumber)) return 1 * modifier;
         if (parseInt(a.address.streetNumber) < parseInt(b.address.streetNumber)) return -1 * modifier;
-        })
-        // .filter((row, index) => {
-        //   let start = (this.currentPage - 1) * this.pageSize;
-        //   let end = this.currentPage * this.pageSize;
-        //   if (index >= start && index < end) return true;
-        // });
+        });
       } else if (this.currentSort === 'ward') {
         return this.sellerList.sort((a, b) => {
           if (a.ward < b.ward) return -1 * modifier;
           if (a.ward > b.ward) return 1 * modifier;
           return 0;
-        })
-        // .filter((row, index) => {
-        //   let start = (this.currentPage - 1) * this.pageSize;
-        //   let end = this.currentPage * this.pageSize;
-        //   if (index >= start && index < end) return true;
-        // });
-          
+        });
       }
     },
 
@@ -392,16 +369,19 @@ export default {
         this.currentSortDir === "asc";
       }
 
-      return this.sellerList
-        .filter(seller => {
+
+      if (this.checkedCategories.length === 0) {
+        return this.sellerList.filter(seller => {
           let itemsList = this.filterCategoriesInclusive(seller);
           return itemsList;
-        })
-    // .filter((row, index) => {
-    //   let start = (this.currentPage - 1) * this.pageSize;
-    //   let end = this.currentPage * this.pageSize;
-    //   if (index >= start && index < end) return true;
-    // });
+        });
+      } else {
+          return this.sellerList.filter(seller => {
+            let itemsList = this.filterCategoriesExclusive(seller);
+            return itemsList;
+        });
+      }
+
     }
   }
 };
@@ -409,74 +389,5 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-.container {
-  width: 90%;
-  max-width: 1100px;
-  margin: 0 auto;
-}
-
-
-#map {
-  width: 100%;
-  height: 60vh;
-  background-color: #cccccc;
-  border-top: 2px solid #cccccc;
-  border-bottom: 2px solid #cccccc;
-}
-
-.filter-buttons {
-  display: flex;
-  justify-content: space-between;
-  list-style: none;
-  margin: 20px 0;
-  padding: 0;
-}
-
-.filter-button {
-  /* display: block; */
-  padding: 10px;
-  border: 1px solid #ccc;
-}
-
-.filterButtonActive {
-  background-color: #ccc;
-}
-
-.sellers-table {
-  color: #545454;
-  border-spacing: 10px;
-  font-family: avenir;
-  font-size: 16px;
-  margin: 0 auto 100px;
-  width: 80%;
-  float: right;
-
-  th {
-    padding: 12px 10px;
-    background-color: #f3f3f3;
-  }
-
-  td {
-    padding: 12px 10px;
-    border-bottom: 1px solid #cccccc;
-
-    &.address {
-      width: 200px;
-    }
-    &.ward {
-      width: 100px;
-    }
-  }
-}
-
-.info-address {
-  font-size: 20px;
-}
-
-.fa-chevron-down, .fa-chevron-up {
-  float: right;
-  color: #A00105;
-  font-size: 18px;
-}
-
+ @import '@/assets/styles/main.scss';
 </style>
