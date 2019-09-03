@@ -1,10 +1,11 @@
 <template>
   <div>
+    <div class="top-bar"></div>
     <div class="container">
       <div class="main-info">
-        <h1 class="headline">2019 Melrose City Wide Yard Sale</h1>
-        <h2 class="subhead">Saturday, Sept. 21, 2019</h2>
-        <h3 class="time">9:00 am &ndash; 2:00 pm</h3>
+        <h1 class="headline">2017 Melrose City Wide Yard&nbsp;Sale</h1>
+        <h2 class="subhead"> to Benefit Friends of the Milano Center</h2>
+        <h3 class="date-time">Saturday, Sept. XX, 2017, 9:00 am &ndash; 2:00 pm</h3>
       </div>
     </div>
     <div id="map"></div>
@@ -19,14 +20,16 @@
               <option value="ward">Sort by: Ward</option>
               <option value="address">Sort by: Street Name</option>
             </select>
-            <div class="filter-label">
+            <div class="filter-label" @click="showFilters()">
               <h4>Filters</h4>
+              <i v-show="mobileFilter" class="material-icons">filter_list</i>
+              <i v-show="!mobileFilter" class="material-icons">close</i>
             </div>
           </div>
-          <div class="filters-container">
-            <label v-for="category in categories" :key="index" class="filter-checkbox">{{category}}<input type="checkbox" :value="category" v-model="checkedCategories" @change="filterByTypeCheckbox(); filterMarkers()"> <span class="checkmark"></span></label>
+          <div id="filters-container" class="filters-container">
+            <label v-for="category in categories" class="filter-checkbox">{{category}}<input type="checkbox" :value="category" v-model="checkedCategories" @change="filterByTypeCheckbox(); filterMarkers()"> <span class="checkmark"></span></label>
           </div>
-          <div class="clear-filters">
+          <div id="clear-filters" class="clear-filters">
             <p @click="clearFilters()">clear filters</p>
           </div>
         </div>
@@ -68,6 +71,7 @@ import { lookUpWard, wardListings } from "@/wardListings";
 export default {
   data() {
     return {
+      mobileFilter: true,
       sellerList: [],
       loading: true,
       errored: false,
@@ -104,6 +108,17 @@ export default {
   },
 
   methods: {
+    showFilters: function() {
+      this.mobileFilter = !this.mobileFilter;
+      if (this.mobileFilter === false) {
+        document.getElementById('filters-container').classList.add('active');
+        document.getElementById('clear-filters').classList.add('active');
+      } else {
+        document.getElementById('filters-container').classList.remove('active');
+        document.getElementById('clear-filters').classList.remove('active');
+      }
+    },
+
     formatData: function(response) {
       const sellerList = [];
 
@@ -314,7 +329,7 @@ export default {
     }
   },
 
-  computed: {
+  computed: {  
     numResults() {
       return this.filteredList.length;
     },
