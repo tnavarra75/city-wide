@@ -127,7 +127,7 @@ export default {
         const streetName = response.data.feed.entry[i].gsx$streetname.$t;
         const cityState = "Melrose MA";
         const ward = lookUpWard(streetName);
-        const itemsList = response.data.feed.entry[i].gsx$itemslist.$t;
+        let itemsList = response.data.feed.entry[i].gsx$itemslist.$t;
         // replace TG with G and ALL with X to make maping easier
         itemsList = itemsList
           .replace("TG", "G")
@@ -390,4 +390,5 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
  @import '@/assets/styles/main.scss';
+ 
 </style>
