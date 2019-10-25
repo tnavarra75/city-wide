@@ -3,9 +3,9 @@
     <div class="top-bar"></div>
     <div class="container">
       <div class="main-info">
-        <h1 class="headline">2017 Melrose City Wide Yard&nbsp;Sale</h1>
+        <h1 class="headline">20XX Melrose City Wide Yard&nbsp;Sale</h1>
         <h2 class="subhead"> to Benefit Friends of the Milano Center</h2>
-        <h3 class="date-time">Saturday, Sept. XX, 2017, 9:00 am &ndash; 2:00 pm</h3>
+        <h3 class="date-time">Saturday, Sept. XX, 20XX, 9:00 am &ndash; 2:00 pm</h3>
       </div>
     </div>
     <div id="map"></div>
@@ -27,7 +27,7 @@
             </div>
           </div>
           <div id="filters-container" class="filters-container">
-            <label v-for="category in categories" class="filter-checkbox">{{category}}<input type="checkbox" :value="category" v-model="checkedCategories" @change="filterByTypeCheckbox(); filterMarkers()"> <span class="checkmark"></span></label>
+            <label v-for="category in categories" :key="category" class="filter-checkbox">{{category}}<input type="checkbox" :value="category" v-model="checkedCategories" @change="filterByTypeCheckbox(); filterMarkers()"> <span class="checkmark"></span></label>
           </div>
           <div id="clear-filters" class="clear-filters">
             <p @click="clearFilters()">clear filters</p>
@@ -52,7 +52,7 @@
             </div>
           </div>
           <transition-group name="list" tag="div">
-            <div class="listing" v-for="(seller, index) in (sortedActivity, filteredList)" :key="index">
+            <div class="listing" v-for="(seller) in (sortedActivity, filteredList)" :key="seller.id">
               <div class="street-name" v-if="sellerList">{{seller.address.streetNumber}} {{seller.address.streetName}} <a class="directions" target="blank" :href="`https://google.com/maps/dir/?api=1&destination=${seller.address.streetNumber}+${seller.address.streetName}+Melrose+MA+02176`"><i class="fas fa-location-arrow"></i></a></div>
               <div class="ward">{{seller.ward}}</div>
               <div class="items-list">{{seller.itemsList}}</div>
@@ -66,7 +66,7 @@
 
 <script>
 import axios from "axios";
-import { lookUpWard, wardListings } from "@/wardListings";
+import { lookUpWard } from "@/wardListings";
 
 export default {
   data() {
@@ -127,6 +127,7 @@ export default {
         const streetName = response.data.feed.entry[i].gsx$streetname.$t;
         const cityState = "Melrose MA";
         const ward = lookUpWard(streetName);
+        const id = i;
         let itemsList = response.data.feed.entry[i].gsx$itemslist.$t;
         // replace TG with G and ALL with X to make maping easier
         itemsList = itemsList
@@ -155,8 +156,6 @@ export default {
             } else if (item === "X") {
               return (item =
                 "antiques, baby items, clothing, furniture, toys/games, jewelry, kitchen items, sporting goods, tools");
-            } else {
-              return (item = item);
             }
           })
           .sort()
@@ -165,6 +164,7 @@ export default {
         const latLng = response.data.feed.entry[i].gsx$latlng.$t;
 
         const createSeller = function(
+          id,
           streetNumber,
           streetName,
           cityState,
@@ -173,6 +173,7 @@ export default {
           latLng
         ) {
           return {
+            id,
             address: {
               streetNumber,
               streetName,
@@ -185,6 +186,7 @@ export default {
         };
 
         const newSeller = createSeller(
+          id,
           streetNumber,
           streetName,
           cityState,
@@ -344,10 +346,13 @@ export default {
 
     sortedActivity() {
       let modifier = 1;
+      let sortedList;
+      const toSort = this.sellerList;
+
       if (this.currentSortDir === "desc") modifier = -1;
 
       if (this.currentSort === 'address') {
-        return this.sellerList.sort((a, b) => {
+        sortedList = toSort.sort((a, b) => {
         // streetNames in alphabetical order
         if (a.address.streetName > b.address.streetName) return 1 * modifier;
         if (a.address.streetName < b.address.streetName) return -1 * modifier;
@@ -355,20 +360,20 @@ export default {
         if (parseInt(a.address.streetNumber) > parseInt(b.address.streetNumber)) return 1 * modifier;
         if (parseInt(a.address.streetNumber) < parseInt(b.address.streetNumber)) return -1 * modifier;
         });
-      } else if (this.currentSort === 'ward') {
-        return this.sellerList.sort((a, b) => {
+      } else {
+        sortedList = toSort.sort((a, b) => {
           if (a.ward < b.ward) return -1 * modifier;
           if (a.ward > b.ward) return 1 * modifier;
           return 0;
         });
       }
+      return sortedList;
     },
 
     filteredList() {
       if (this.currentSortDir === "desc") {
         this.currentSortDir === "asc";
       }
-
 
       if (this.checkedCategories.length === 0) {
         return this.sellerList.filter(seller => {
