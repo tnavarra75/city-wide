@@ -81,6 +81,7 @@ a {
     display: flex;
     flex-wrap: wrap;
     .street-name {
+        cursor: pointer;
         flex: 2 0 0;
         margin-right: 10px;
         padding: 10px;
@@ -99,6 +100,7 @@ a {
         }
     }
     .ward {
+        cursor: pointer;
         flex: .8 0 0;
         margin-right: 10px;
         padding: 10px;
@@ -218,9 +220,12 @@ a {
         transform: rotate(45deg);
     }
     /* On mouse-over, add a grey background color */
-    &:hover input~.checkmark {
-        background-color: #ccc;
+    @media screen and (min-width: 769px) {
+        &:hover input~.checkmark {
+            background-color: #ccc;
+        }
     }
+
 }
 
 .fa-chevron-down,
@@ -323,6 +328,7 @@ a {
 }
 
 .clear-filters {
+    cursor: pointer;
     display: none;
     background-color: #f3f3f3;
     text-decoration: underline;
